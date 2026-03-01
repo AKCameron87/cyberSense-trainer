@@ -1,0 +1,60 @@
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #1f2937;
+  border-top-color: #00d4ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.flag-item {
+  @apply flex items-start gap-2 p-2 rounded-lg transition-all duration-300;
+}
+
+.flag-found {
+  @apply bg-cyber-green bg-opacity-10 border border-cyber-green border-opacity-30;
+}
+
+.flag-hidden {
+  @apply bg-cyber-border bg-opacity-20 border border-cyber-border;
+}
+
+.scenario-body {
+  pointer-events: all;
+}
+
+.scenario-body [id^="rf-"] {
+  transition: outline 0.2s ease;
+}
+
+.scenario-body [id^="rf-"]:hover {
+  outline: 2px dashed rgba(0, 212, 255, 0.5);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.feedback-toast {
+  @apply fixed bottom-6 right-6 max-w-sm w-full card border-cyber-green
+         shadow-lg z-50 animate-slide-in;
+  border-color: #00ff88;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease forwards;
+}

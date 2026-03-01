@@ -1,1 +1,81 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-cyber-dark text-white font-mono;
+  }
+
+  * {
+    @apply border-cyber-border;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-cyber-darker;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-cyber-accent rounded-full;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-2.5 bg-cyber-accent text-cyber-dark font-bold rounded-lg 
+           hover:bg-opacity-80 transition-all duration-200 cursor-pointer;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-2.5 border border-cyber-accent text-cyber-accent font-bold 
+           rounded-lg hover:bg-cyber-accent hover:text-cyber-dark 
+           transition-all duration-200 cursor-pointer;
+  }
+
+  .card {
+    @apply bg-cyber-card border border-cyber-border rounded-xl p-6;
+  }
+
+  .badge-rookie {
+    @apply px-3 py-1 bg-cyber-green text-cyber-dark text-xs font-bold rounded-full;
+  }
+
+  .badge-analyst {
+    @apply px-3 py-1 bg-cyber-yellow text-cyber-dark text-xs font-bold rounded-full;
+  }
+
+  .badge-expert {
+    @apply px-3 py-1 bg-cyber-red text-white text-xs font-bold rounded-full;
+  }
+}
+
+/* Page transition animations */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+}
+
+.page-enter {
+  animation: fadeSlideIn 0.35s ease forwards;
+}

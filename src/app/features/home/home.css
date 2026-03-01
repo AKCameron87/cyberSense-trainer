@@ -1,0 +1,95 @@
+.grid-bg {
+    width: 100%;
+    height: 100%;
+    background-image:
+     linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+     linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px; 
+}
+
+.glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    pointer-events: none;
+}
+
+.glow-orb-1 {
+  width: 600px;
+  height: 600px;
+  background: #00d4ff;
+  top: -200px;
+  right: -100px;
+}
+
+.glow-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: #00ff88;
+  bottom: -100px;
+  left: -100px;
+}
+
+/* Difficulty buttons */
+.diff-btn {
+  @apply px-6 py-3 rounded-xl border-2 transition-all duration-200 text-center min-w-[140px];
+}
+
+.diff-btn-rookie {
+  @apply diff-btn border-cyber-green text-cyber-green hover:bg-cyber-green hover:text-cyber-dark;
+}
+
+.diff-btn-analyst {
+  @apply diff-btn border-cyber-yellow text-cyber-yellow hover:bg-cyber-yellow hover:text-cyber-dark;
+}
+
+.diff-btn-expert {
+  @apply diff-btn border-cyber-red text-cyber-red hover:bg-cyber-red hover:text-white;
+}
+
+.diff-btn-active-rookie  { @apply diff-btn bg-cyber-green text-cyber-dark border-cyber-green; }
+.diff-btn-active-analyst { @apply diff-btn bg-cyber-yellow text-cyber-dark border-cyber-yellow; }
+.diff-btn-active-expert  { @apply diff-btn bg-cyber-red text-white border-cyber-red; }
+
+/* Mode cards */
+.mode-card {
+  @apply transition-all duration-300 hover:border-cyber-accent hover:-translate-y-1;
+}
+
+.mode-glow {
+  @apply absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl;
+}
+
+.mode-glow-accent {
+  background: radial-gradient(ellipse at top left, rgba(0, 212, 255, 0.08), transparent 60%);
+}
+
+.mode-glow-green {
+  background: radial-gradient(ellipse at top left, rgba(0, 255, 136, 0.08), transparent 60%);
+}
+
+.arrow-badge {
+  @apply w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold
+         transition-transform duration-200 group-hover:translate-x-1;
+}
+
+.arrow-badge-accent {
+  @apply arrow-badge bg-cyber-accent bg-opacity-10 text-cyber-accent;
+}
+
+.arrow-badge-green {
+  @apply arrow-badge bg-cyber-green bg-opacity-10 text-cyber-green;
+}
+
+.tag {
+  @apply px-2.5 py-1 rounded-md text-xs font-medium;
+}
+
+.tag-accent {
+  @apply tag bg-cyber-accent bg-opacity-10 text-cyber-accent;
+}
+
+.tag-green {
+  @apply tag bg-cyber-green bg-opacity-10 text-cyber-green;
+}

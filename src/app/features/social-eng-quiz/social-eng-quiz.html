@@ -1,0 +1,215 @@
+<div class="min-h-screen bg-cyber-dark text-white page-enter">
+<div class="min-h-screen bg-cyber-dark text-white">
+
+  <!-- Header -->
+  <header class="flex items-center justify-between px-6 py-4 border-b border-cyber-border">
+    <button (click)="goHome()" class="flex items-center gap-2 text-cyber-muted hover:text-white transition-colors">
+      ← Back
+    </button>
+    <div class="flex items-center gap-4">
+      <div *ngIf="streak >= 3" class="flex items-center gap-1 text-cyber-yellow text-sm font-bold">
+        🔥 {{ streak }} streak
+      </div>
+      <span class="text-cyber-muted text-sm">Score:</span>
+      <span class="text-cyber-accent font-bold text-lg">{{ sessionScore }}</span>
+      <span [class]="getDifficultyBadgeClass()">{{ getDifficultyLabel() }}</span>
+    </div>
+  </header>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex items-center justify-center min-h-[60vh]">
+    <div class="text-center">
+      <div class="spinner mb-4"></div>
+      <p class="text-cyber-muted">Loading questions...</p>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="flex items-center justify-center min-h-[60vh]">
+    <div class="card text-center max-w-md">
+      <p class="text-4xl mb-4">⚠️</p>
+      <p class="text-white font-bold mb-2">Failed to load questions</p>
+      <button (click)="goHome()" class="btn-secondary mt-4">Go Home</button>
+    </div>
+  </div>
+
+  <!-- Pre-session lobby -->
+  <div *ngIf="!loading && !error && !sessionStarted" class="max-w-3xl mx-auto px-6 py-16 text-center">
+    <span class="text-6xl mb-6 block">🧠</span>
+    <h2 class="text-4xl font-bold mb-4">Social Engineering Quiz</h2>
+    <p class="text-cyber-muted text-lg mb-8 max-w-xl mx-auto">
+      You'll face <strong class="text-white">{{ questions.length }} realistic scenarios</strong>
+      across multiple attack types. Read carefully and choose the best response.
+    </p>
+
+    <div class="grid grid-cols-3 gap-4 mb-10 max-w-md mx-auto">
+      <div class="card py-4 text-center">
+        <p class="text-cyber-accent font-bold text-xl">{{ questions.length }}</p>
+        <p class="text-cyber-muted text-xs mt-1">Questions</p>
+      </div>
+      <div class="card py-4 text-center">
+        <p class="text-cyber-green font-bold text-xl">{{ totalPossible }}</p>
+        <p class="text-cyber-muted text-xs mt-1">Max Points</p>
+      </div>
+      <div class="card py-4 text-center">
+        <p class="text-cyber-yellow font-bold text-xl">{{ getDifficultyLabel() }}</p>
+        <p class="text-cyber-muted text-xs mt-1">Difficulty</p>
+      </div>
+    </div>
+
+    <div class="card text-left mb-8 max-w-md mx-auto">
+      <h3 class="font-bold mb-3 text-cyber-accent">Attack types covered</h3>
+      <div class="flex flex-wrap gap-2">
+        <span class="tag tag-accent">🎣 Phishing</span>
+        <span class="tag tag-accent">📞 Vishing</span>
+        <span class="tag tag-accent">💬 Smishing</span>
+        <span class="tag tag-accent">🪤 Baiting</span>
+        <span class="tag tag-accent">🎭 Pretexting</span>
+      </div>
+    </div>
+
+    <button (click)="startSession()" class="btn-primary text-lg px-10 py-3">
+      Start Quiz →
+    </button>
+  </div>
+
+  <!-- Active quiz -->
+  <div *ngIf="sessionStarted && !sessionComplete && currentQuestion"
+       class="max-w-3xl mx-auto px-6 py-8">
+
+    <!-- Progress -->
+    <div class="flex items-center gap-4 mb-8">
+      <span class="text-xs text-cyber-muted whitespace-nowrap">
+        {{ currentIndex + 1 }} / {{ questions.length }}
+      </span>
+      <div class="flex-1 h-1.5 bg-cyber-border rounded-full overflow-hidden">
+        <div class="h-full bg-cyber-accent rounded-full transition-all duration-500"
+             [style.width.%]="(currentIndex / questions.length) * 100">
+        </div>
+      </div>
+      <div *ngIf="timeLeft !== null" [class]="'timer-badge ' + getTimerClass()">
+        ⏱ {{ timeLeft }}s
+      </div>
+    </div>
+
+    <!-- Question card -->
+    <div class="card mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-xs px-3 py-1 rounded-full bg-cyber-accent bg-opacity-10 text-cyber-accent">
+          {{ getAttackTypeLabel(currentQuestion?.attackType ?? '') }}
+        </span>
+        <span class="text-xs text-cyber-muted">
+          {{ currentQuestion?.points }} pts
+        </span>
+      </div>
+      <div class="scenario-box mb-2">
+        <p class="text-sm text-cyber-muted uppercase tracking-wider mb-2">Scenario</p>
+        <p class="text-white leading-relaxed">{{ currentQuestion?.scenario }}</p>
+      </div>
+    </div>
+
+    <!-- Timer expired banner -->
+    <div *ngIf="timerExpired" class="timer-expired-banner mb-4">
+      ⏰ Time's up! The correct answer has been revealed.
+    </div>
+
+    <!-- Answer options -->
+    <div class="space-y-3 mb-6">
+      <button
+        *ngFor="let option of currentQuestion?.options"
+        [class]="'option-btn ' + getOptionClass(option.id)"
+        (click)="selectAnswer(option.id)"
+        [disabled]="answerSubmitted">
+        <span class="option-letter">{{ option.id.toUpperCase() }}</span>
+        <span class="flex-1 text-left">{{ option.text }}</span>
+        <span *ngIf="answerSubmitted && option.id === currentQuestion?.correctId"
+              class="text-cyber-green text-lg">✓</span>
+        <span *ngIf="answerSubmitted && option.id === selectedAnswer && !isCorrect"
+              class="text-cyber-red text-lg">✗</span>
+      </button>
+    </div>
+
+    <!-- Submit / Next -->
+    <div class="flex justify-between items-center">
+      <div *ngIf="!answerSubmitted">
+        <button
+          (click)="submitAnswer()"
+          [disabled]="!selectedAnswer"
+          class="btn-primary px-8"
+          [class.opacity-50]="!selectedAnswer">
+          Submit Answer
+        </button>
+      </div>
+
+      <!-- Explanation -->
+      <div *ngIf="answerSubmitted" class="w-full">
+        <div [class]="isCorrect ? 'explanation-correct' : 'explanation-wrong'">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-xl">{{ isCorrect ? '✅' : '❌' }}</span>
+            <span class="font-bold">{{ isCorrect ? 'Correct!' : 'Incorrect' }}</span>
+            <span *ngIf="isCorrect" class="text-sm opacity-80">
+              +{{ currentQuestion?.points }} pts
+            </span>
+          </div>
+          <p class="text-sm leading-relaxed mb-3">{{ currentQuestion?.explanation }}</p>
+          <div class="tip-box">
+            <span class="text-cyber-yellow font-bold text-xs uppercase tracking-wider">💡 Security Tip</span>
+            <p class="text-sm mt-1">{{ currentQuestion?.tip }}</p>
+          </div>
+        </div>
+
+        <button (click)="nextQuestion()" class="btn-primary w-full mt-4">
+          {{ currentIndex < questions.length - 1 ? 'Next Question →' : 'See Results →' }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Session complete -->
+  <div *ngIf="sessionComplete" class="max-w-2xl mx-auto px-6 py-16 text-center">
+    <span class="text-6xl mb-4 block">🏁</span>
+    <h2 class="text-4xl font-bold mb-2">Quiz Complete!</h2>
+
+    <div [class]="'text-2xl font-bold mb-8 ' + getGrade().color">
+      {{ getGrade().label }}
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="card py-4">
+        <p class="text-3xl font-bold text-cyber-accent">{{ sessionScore }}</p>
+        <p class="text-cyber-muted text-xs mt-1">Total Points</p>
+      </div>
+      <div class="card py-4">
+        <p class="text-3xl font-bold text-cyber-green">{{ correctCount }}/{{ questions.length }}</p>
+        <p class="text-cyber-muted text-xs mt-1">Correct</p>
+      </div>
+      <div class="card py-4">
+        <p class="text-3xl font-bold text-cyber-yellow">{{ getScorePercentage() }}%</p>
+        <p class="text-cyber-muted text-xs mt-1">Accuracy</p>
+      </div>
+      <div class="card py-4">
+        <p class="text-3xl font-bold text-cyber-red">{{ bestStreak }}</p>
+        <p class="text-cyber-muted text-xs mt-1">Best Streak</p>
+      </div>
+    </div>
+
+    <div class="card mb-8">
+      <div class="flex justify-between text-xs text-cyber-muted mb-2">
+        <span>Score</span>
+        <span>{{ sessionScore }} / {{ totalPossible }}</span>
+      </div>
+      <div class="h-3 bg-cyber-border rounded-full overflow-hidden">
+        <div class="h-full bg-cyber-accent rounded-full transition-all duration-1000"
+             [style.width.%]="getScorePercentage()">
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-4 justify-center">
+      <button (click)="goHome()" class="btn-secondary">← Home</button>
+      <button (click)="goToResults()" class="btn-primary">View Results →</button>
+    </div>
+  </div>
+
+</div>

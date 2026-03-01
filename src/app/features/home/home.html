@@ -1,0 +1,178 @@
+<div class="min-h-screen bg-cyber-dark text-white page-enter">
+<div class="min-h-screen bg-cyber-dark text-white overflow-x-hidden">
+
+  <!-- Animated background grid -->
+  <div class="fixed inset-0 pointer-events-none z-0">
+    <div class="grid-bg"></div>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="relative z-10 flex items-center justify-between px-8 py-5 border-b border-cyber-border">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-cyber-accent flex items-center justify-center text-cyber-dark font-bold text-lg">
+        CS
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-widest text-white">CYBERSENSE</h1>
+        <p class="text-xs text-cyber-muted tracking-widest uppercase">Security Trainer</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-6">
+      <!-- Stats row -->
+      <div class="hidden md:flex items-center gap-6 text-sm">
+        <div class="text-center">
+          <p class="text-cyber-accent font-bold text-lg">{{ totalPoints }}</p>
+          <p class="text-cyber-muted text-xs uppercase tracking-wider">Points</p>
+        </div>
+        <div class="w-px h-8 bg-cyber-border"></div>
+        <div class="text-center">
+          <p class="text-cyber-green font-bold text-lg">{{ accuracy }}%</p>
+          <p class="text-cyber-muted text-xs uppercase tracking-wider">Accuracy</p>
+        </div>
+        <div class="w-px h-8 bg-cyber-border"></div>
+        <div class="text-center">
+          <p class="text-cyber-yellow font-bold text-lg">{{ totalSessions }}</p>
+          <p class="text-cyber-muted text-xs uppercase tracking-wider">Sessions</p>
+        </div>
+      </div>
+
+      <button (click)="goToDashboard()"
+              class="btn-secondary text-sm px-4 py-2">
+        Dashboard
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <main class="relative z-10 max-w-6xl mx-auto px-6 py-16">
+
+    <div class="text-center mb-16">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-cyber-accent
+                  text-cyber-accent text-xs tracking-widest uppercase mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyber-accent animate-pulse"></span>
+        Security Awareness Training
+      </div>
+
+      <h2 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+        Can You Spot
+        <span class="text-cyber-accent"> The Threat?</span>
+      </h2>
+
+      <p class="text-cyber-muted text-lg max-w-2xl mx-auto leading-relaxed">
+        Train your instincts against real-world phishing attacks and social engineering tactics.
+        Learn to identify threats before they become incidents.
+      </p>
+    </div>
+
+    <!-- Difficulty Selector -->
+    <div class="mb-12">
+      <p class="text-center text-xs text-cyber-muted uppercase tracking-widest mb-4">
+        Select Difficulty
+      </p>
+
+      <div class="flex justify-center gap-4 flex-wrap">
+        <button
+          *ngFor="let diff of difficulties"
+          (click)="selectDifficulty(diff)"
+          [class]="getDifficultyClass(diff)">
+
+          <span class="font-bold tracking-wider">{{ diff.label }}</span>
+          <span class="text-xs opacity-70 block mt-0.5">
+            {{ diff.timerSeconds ? diff.timerSeconds + 's timer' : 'No timer' }}
+            · {{ diff.pointMultiplier }}x points
+          </span>
+        </button>
+      </div>
+
+      <!-- Difficulty description -->
+      <p class="text-center text-cyber-muted text-sm mt-4">
+        {{ selectedDifficulty.description }}
+      </p>
+    </div>
+
+    <!-- Mode Cards -->
+    <div class="grid md:grid-cols-2 gap-6 mb-16">
+      <div
+      *ngFor="let mode of modes"
+      class="mode-card card cursor-pointer group relative overflow-hidden"
+      (click)="navigateTo(mode.route)">
+
+
+        <!-- Hover glow effect -->
+        <div [class]="'mode-glow mode-glow-' + mode.color"></div>
+
+        <div class="relative z-10">
+          <!-- Icon & Title -->
+          <div class="flex items-start justify-between mb-4">
+            <div>
+              <span class="text-4xl mb-3 block">{{ mode.icon }}</span>
+              <p class="text-xs text-cyber-muted uppercase tracking-widest mb-1">
+                {{ mode.subtitle }}
+              </p>
+              <h3 class="text-2xl font-bold">{{ mode.title }}</h3>
+            </div>
+            <div [class]="'arrow-badge arrow-badge-' + mode.color">
+              →
+            </div>
+          </div>
+
+          <!-- Description -->
+          <p class="text-cyber-muted text-sm leading-relaxed mb-6">
+            {{ mode.description }}
+          </p>
+
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-2">
+            <span
+              *ngFor="let tag of mode.tags"
+              [class]="'tag tag-' + mode.color">
+              {{ tag }}
+            </span>
+          </div>
+
+          <!-- Difficulty badge -->
+          <div class="mt-6 pt-4 border-t border-cyber-border flex items-center justify-between">
+            <span [class]="selectedDifficulty.badgeClass">
+              {{ selectedDifficulty.label }}
+            </span>
+            <span class="text-xs text-cyber-muted">
+              {{ selectedDifficulty.pointMultiplier }}x point multiplier
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Strip -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+      <div class="card py-4">
+        <p class="text-2xl font-bold text-cyber-accent">15+</p>
+        <p class="text-xs text-cyber-muted mt-1 uppercase tracking-wider">Quiz Scenarios</p>
+      </div>
+      <div class="card py-4">
+        <p class="text-2xl font-bold text-cyber-green">6</p>
+        <p class="text-xs text-cyber-muted mt-1 uppercase tracking-wider">Phishing Simulations</p>
+      </div>
+      <div class="card py-4">
+        <p class="text-2xl font-bold text-cyber-yellow">3</p>
+        <p class="text-xs text-cyber-muted mt-1 uppercase tracking-wider">Difficulty Tiers</p>
+      </div>
+      <div class="card py-4">
+        <p class="text-2xl font-bold text-cyber-red">5</p>
+        <p class="text-xs text-cyber-muted mt-1 uppercase tracking-wider">Attack Types</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-cyber-border px-8 py-5 text-center">
+    <p class="text-cyber-muted text-xs tracking-wider">
+      CYBERSENSE TRAINER · Built for security awareness education
+    </p>
+  </footer>
+
+</div>

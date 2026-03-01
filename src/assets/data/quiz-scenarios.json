@@ -1,0 +1,450 @@
+[
+  {
+    "id": "q001",
+    "attackType": "phishing",
+    "difficulty": "rookie",
+    "scenario": "You receive an email from 'support@paypa1.com' saying your account has been suspended. It asks you to click a link and verify your login credentials immediately or your account will be permanently closed.",
+    "options": [
+      { "id": "a", "text": "Click the link immediately — you don't want to lose your account" },
+      { "id": "b", "text": "Reply to the email asking for more information" },
+      { "id": "c", "text": "Ignore it — the sender domain 'paypa1.com' uses a number instead of a letter, it's a fake" },
+      { "id": "d", "text": "Forward it to your friends to warn them" }
+    ],
+    "correctId": "c",
+    "explanation": "The domain 'paypa1.com' replaces the letter 'l' with the number '1' — a classic typosquatting attack. Legitimate companies will never ask you to verify credentials via email. Always navigate directly to the official website instead of clicking email links.",
+    "points": 100,
+    "tip": "Always check the sender's full email domain, not just the display name. Hover over links before clicking to see the real URL."
+  },
+  {
+    "id": "q002",
+    "attackType": "phishing",
+    "difficulty": "rookie",
+    "scenario": "An email from 'IT Department <it-dept@company-helpdesk.net>' tells all staff they must reset their passwords using the attached link before 5pm or they'll be locked out of all systems.",
+    "options": [
+      { "id": "a", "text": "Reset your password immediately using the link — IT sent it" },
+      { "id": "b", "text": "Call or message your actual IT department to verify the request before doing anything" },
+      { "id": "c", "text": "Reset the password but use a fake one just in case" },
+      { "id": "d", "text": "Delete the email and ignore it entirely" }
+    ],
+    "correctId": "b",
+    "explanation": "Urgency and fear of being locked out are classic phishing pressure tactics. The domain 'company-helpdesk.net' is not your company's official domain. Always verify unexpected IT requests through a known, trusted channel like calling the helpdesk directly.",
+    "points": 100,
+    "tip": "Legitimate IT departments will never pressure you with hard deadlines via email for password resets. When in doubt, pick up the phone."
+  },
+  {
+    "id": "q003",
+    "attackType": "phishing",
+    "difficulty": "rookie",
+    "scenario": "You get an email saying you've won a $500 Amazon gift card. It asks you to click a link and enter your name, address, and credit card number to cover shipping costs.",
+    "options": [
+      { "id": "a", "text": "Enter your details — $500 is worth the small shipping fee" },
+      { "id": "b", "text": "Click the link but only enter your name and address, not your card" },
+      { "id": "c", "text": "Delete the email — you never entered a contest and legitimate prizes never require credit card info to claim" },
+      { "id": "d", "text": "Forward it to Amazon to verify if it's real" }
+    ],
+    "correctId": "c",
+    "explanation": "This is a classic prize scam. You never entered a contest, and legitimate prizes never require credit card information. The 'shipping fee' is a trick to steal your payment details.",
+    "points": 100,
+    "tip": "Unsolicited prize notifications are almost always scams. Legitimate contests never require payment to claim winnings."
+  },
+  {
+    "id": "q004",
+    "attackType": "phishing",
+    "difficulty": "analyst",
+    "scenario": "You receive an email that appears to be from your CEO. The display name shows 'James Wright - CEO' and asks you to urgently wire $15,000 to a new vendor account, referencing a real ongoing project.",
+    "options": [
+      { "id": "a", "text": "Process the wire transfer — it came from the CEO" },
+      { "id": "b", "text": "Reply to the email asking for approval documentation" },
+      { "id": "c", "text": "Verify the request by calling the CEO directly using a known phone number, not one provided in the email" },
+      { "id": "d", "text": "Forward to finance and let them decide" }
+    ],
+    "correctId": "c",
+    "explanation": "This is a Business Email Compromise (BEC) attack — one of the most costly cybercrimes. Attackers spoof or compromise executive email accounts. Display names can be faked easily. Always verify financial requests through a secondary out-of-band channel like a direct phone call.",
+    "points": 150,
+    "tip": "BEC attacks cost businesses billions annually. Always verify financial requests via phone using numbers from your company directory, never from the email itself."
+  },
+  {
+    "id": "q005",
+    "attackType": "phishing",
+    "difficulty": "analyst",
+    "scenario": "You get an email from 'no-reply@microsoft-account-security.com' with subject 'Unusual sign-in activity detected'. It includes your real name, your city, and a realistic Microsoft login screenshot asking you to confirm your identity.",
+    "options": [
+      { "id": "a", "text": "The email has your real details so it must be legitimate — confirm your identity" },
+      { "id": "b", "text": "Go directly to account.microsoft.com in a new browser tab to check for any real alerts" },
+      { "id": "c", "text": "Reply with your username only, not your password" },
+      { "id": "d", "text": "Click the link since it says Microsoft and looks real" }
+    ],
+    "correctId": "b",
+    "explanation": "Attackers use personal information harvested from data breaches to make phishing emails more convincing — this is spear phishing. The domain 'microsoft-account-security.com' is NOT a Microsoft domain. Always go directly to the official site rather than clicking email links.",
+    "points": 150,
+    "tip": "Personal details in a phishing email don't make it legitimate. Your information may have been obtained from a previous data breach."
+  },
+  {
+    "id": "q006",
+    "attackType": "phishing",
+    "difficulty": "analyst",
+    "scenario": "A colleague emails you a link to a shared OneDrive document. The link goes to 'onedrive.live.com.document-share.net/view' and asks for your Microsoft credentials to view it.",
+    "options": [
+      { "id": "a", "text": "Enter your credentials — OneDrive always asks you to log in" },
+      { "id": "b", "text": "The real domain is 'document-share.net' not Microsoft — contact your colleague through a different channel to verify" },
+      { "id": "c", "text": "Use your personal email credentials instead of work ones" },
+      { "id": "d", "text": "Open it in incognito mode for safety" }
+    ],
+    "correctId": "b",
+    "explanation": "The URL 'onedrive.live.com.document-share.net' looks like Microsoft but the actual domain is 'document-share.net'. Everything before it is a subdomain. Read URLs right to left from the first slash to find the real domain.",
+    "points": 150,
+    "tip": "Read URLs from right to left. The real domain is always immediately before the first single forward slash. 'onedrive.live.com.evil.net' belongs to 'evil.net'."
+  },
+  {
+    "id": "q007",
+    "attackType": "phishing",
+    "difficulty": "expert",
+    "scenario": "An email arrives from a colleague's exact email address asking you to review a shared Google Doc. The link goes to 'docs.google.com.file-share-portal.io/view' and asks for your Google credentials.",
+    "options": [
+      { "id": "a", "text": "Enter your credentials — the link starts with docs.google.com" },
+      { "id": "b", "text": "The email came from a real colleague so it must be safe" },
+      { "id": "c", "text": "Recognize that the real domain is 'file-share-portal.io' not Google, and contact your colleague through a different channel to verify" },
+      { "id": "d", "text": "Open it on your phone instead" }
+    ],
+    "correctId": "c",
+    "explanation": "This is a subdomain spoofing attack. 'docs.google.com.file-share-portal.io' makes 'file-share-portal.io' the actual domain. The colleague's account may have been compromised. Always read URLs right-to-left from the first single slash.",
+    "points": 200,
+    "tip": "Read URLs from right to left. The real domain is always the text immediately before the first single forward slash."
+  },
+  {
+    "id": "q008",
+    "attackType": "phishing",
+    "difficulty": "expert",
+    "scenario": "You receive a personalized email referencing your recent LinkedIn activity, your manager's name, and a current project. It invites you to a 'security briefing' via a Zoom link that requires downloading a plugin to join.",
+    "options": [
+      { "id": "a", "text": "Download the plugin — Zoom sometimes requires updates" },
+      { "id": "b", "text": "Join but don't download anything" },
+      { "id": "c", "text": "Verify the meeting exists through your calendar or with your manager directly, and never download unsolicited plugins" },
+      { "id": "d", "text": "Join from your personal device to keep work systems safe" }
+    ],
+    "correctId": "c",
+    "explanation": "This is a highly targeted spear phishing attack using OSINT from LinkedIn. The 'plugin' is almost certainly malware. Legitimate Zoom meetings never require special plugins beyond the standard client.",
+    "points": 200,
+    "tip": "Attackers mine LinkedIn and social media to craft convincing spear phishing lures. Verify any unexpected meeting invites with the organizer through a known contact method."
+  },
+  {
+    "id": "q009",
+    "attackType": "vishing",
+    "difficulty": "rookie",
+    "scenario": "You receive a call from someone claiming to be from your bank's fraud department. They say suspicious transactions were detected and ask you to confirm your full card number and CVV to verify your identity.",
+    "options": [
+      { "id": "a", "text": "Provide the details — they called you so they must be your bank" },
+      { "id": "b", "text": "Give only the last 4 digits as a compromise" },
+      { "id": "c", "text": "Hang up and call your bank back using the number on the back of your card" },
+      { "id": "d", "text": "Ask them to email you instead" }
+    ],
+    "correctId": "c",
+    "explanation": "Legitimate banks will NEVER ask for your full card number or CVV over the phone — they already have this information. Always terminate the call and dial your bank using the official number printed on your card.",
+    "points": 100,
+    "tip": "Your bank already knows your card number. Anyone asking for it over the phone is not your bank. Always call back on official numbers."
+  },
+  {
+    "id": "q010",
+    "attackType": "vishing",
+    "difficulty": "rookie",
+    "scenario": "Someone calls claiming to be from the IRS saying you owe back taxes and will be arrested within 24 hours unless you pay immediately using wire transfer or gift cards.",
+    "options": [
+      { "id": "a", "text": "Pay immediately — you don't want to be arrested" },
+      { "id": "b", "text": "Ask for more time and call back the number they provide" },
+      { "id": "c", "text": "Hang up — the IRS never demands immediate payment by phone, wire transfer, or gift cards" },
+      { "id": "d", "text": "Pay half now and dispute the rest later" }
+    ],
+    "correctId": "c",
+    "explanation": "The IRS never calls demanding immediate payment, threatens arrest, or requests gift cards or wire transfers. This is a well-known government impersonation scam. The IRS always sends written notices first.",
+    "points": 100,
+    "tip": "Government agencies like the IRS never demand immediate payment by phone or request gift cards. These are always scams."
+  },
+  {
+    "id": "q011",
+    "attackType": "vishing",
+    "difficulty": "analyst",
+    "scenario": "A caller says they're from Microsoft Support and that your computer is sending error reports and has been compromised. They ask you to install a remote access tool so they can fix it immediately.",
+    "options": [
+      { "id": "a", "text": "Install the tool — Microsoft detected a real problem with your PC" },
+      { "id": "b", "text": "Ask them to hold while you check your computer for errors" },
+      { "id": "c", "text": "Hang up immediately — Microsoft does not make unsolicited support calls" },
+      { "id": "d", "text": "Give them remote access but watch what they do" }
+    ],
+    "correctId": "c",
+    "explanation": "Microsoft, Apple, Google and other tech companies do NOT proactively call customers about computer problems. Installing remote access tools gives attackers full control of your device.",
+    "points": 150,
+    "tip": "No legitimate tech company will ever call you unsolicited about a problem with your device. Hang up immediately."
+  },
+  {
+    "id": "q012",
+    "attackType": "vishing",
+    "difficulty": "analyst",
+    "scenario": "You get a call from someone claiming to be your company's payroll department. They say there's an issue processing your direct deposit and need your bank account and routing number to fix it before payday.",
+    "options": [
+      { "id": "a", "text": "Provide the details — you don't want to miss your paycheck" },
+      { "id": "b", "text": "Give your routing number but not the account number" },
+      { "id": "c", "text": "Hang up and contact HR or payroll directly using contact info from the company intranet" },
+      { "id": "d", "text": "Ask them to send an email request instead" }
+    ],
+    "correctId": "c",
+    "explanation": "Payroll departments never call employees to request banking details over the phone. This is a social engineering attack designed to redirect your paycheck. Always verify payroll issues through official HR channels.",
+    "points": 150,
+    "tip": "Never provide banking details over an unsolicited phone call. Contact HR or payroll directly using numbers from your company's official intranet."
+  },
+  {
+    "id": "q013",
+    "attackType": "vishing",
+    "difficulty": "expert",
+    "scenario": "You receive a call that appears to show your company's internal IT helpdesk number on caller ID. The caller knows your name, employee ID, and current project. They say there's an urgent security incident and need your VPN credentials to investigate.",
+    "options": [
+      { "id": "a", "text": "Provide the credentials — the caller ID and personal details confirm it's IT" },
+      { "id": "b", "text": "Provide only your username, not your password" },
+      { "id": "c", "text": "Tell them you'll walk over to IT in person, or call the IT number back from the company directory" },
+      { "id": "d", "text": "Ask them to send a follow-up email with their badge number" }
+    ],
+    "correctId": "c",
+    "explanation": "Caller ID can be spoofed trivially using VoIP tools. Personal details can be gathered from LinkedIn or prior breaches. Legitimate IT staff never need your password. This is an advanced vishing attack.",
+    "points": 200,
+    "tip": "Caller ID spoofing is easy and cheap. IT departments never need your password. Verify in person or via a call-back to a number you independently sourced."
+  },
+  {
+    "id": "q014",
+    "attackType": "vishing",
+    "difficulty": "expert",
+    "scenario": "A caller claims to be a security researcher who discovered a critical vulnerability in your company's systems. They need you to create a temporary admin account for them to 'verify the fix' before responsibly disclosing it.",
+    "options": [
+      { "id": "a", "text": "Create the account — you want the vulnerability fixed quickly" },
+      { "id": "b", "text": "Create a limited read-only account instead" },
+      { "id": "c", "text": "Decline and direct them to your company's official security disclosure program, then report the call to your security team" },
+      { "id": "d", "text": "Ask for their credentials first before creating the account" }
+    ],
+    "correctId": "c",
+    "explanation": "Legitimate security researchers never call and demand account access. Real responsible disclosure programs are documented publicly. Report this call to your security team immediately as a potential targeted attack.",
+    "points": 200,
+    "tip": "Legitimate security researchers use official bug bounty and disclosure programs. Never create accounts or grant access based on unsolicited calls."
+  },
+  {
+    "id": "q015",
+    "attackType": "smishing",
+    "difficulty": "rookie",
+    "scenario": "You receive a text: 'USPS: Your package could not be delivered. Please update your delivery address within 24hrs to avoid return: usps-delivery-update.com/track'",
+    "options": [
+      { "id": "a", "text": "Click the link — you are expecting a package" },
+      { "id": "b", "text": "Reply STOP to unsubscribe" },
+      { "id": "c", "text": "Go directly to usps.com in your browser and track your package there" },
+      { "id": "d", "text": "Call the number the text came from" }
+    ],
+    "correctId": "c",
+    "explanation": "USPS will never ask you to click a link or enter personal/payment info to reschedule a delivery via unsolicited text. The domain 'usps-delivery-update.com' is not affiliated with USPS. Always track packages directly at the official carrier website.",
+    "points": 100,
+    "tip": "Delivery scam texts are among the most common smishing attacks. Always go directly to the carrier's official website to track packages."
+  },
+  {
+    "id": "q016",
+    "attackType": "smishing",
+    "difficulty": "rookie",
+    "scenario": "You receive a text: 'Your Netflix account has been suspended due to a billing issue. Update your payment info now: netflix-billing-update.com'",
+    "options": [
+      { "id": "a", "text": "Click the link and update your payment — you don't want to lose Netflix" },
+      { "id": "b", "text": "Reply to the text with your account email to verify" },
+      { "id": "c", "text": "Open the Netflix app or go to netflix.com directly to check your account status" },
+      { "id": "d", "text": "Ignore it since you don't have Netflix" }
+    ],
+    "correctId": "c",
+    "explanation": "Netflix sends billing notifications through the app or to your registered email, never via SMS links to third-party domains. 'netflix-billing-update.com' is not Netflix.",
+    "points": 100,
+    "tip": "Streaming service smishing attacks are extremely common. Always check account status through the official app, never through links in text messages."
+  },
+  {
+    "id": "q017",
+    "attackType": "smishing",
+    "difficulty": "analyst",
+    "scenario": "You get a text from a number claiming to be your bank: 'ALERT: A new device was added to your account. If this wasn't you, call us immediately at 1-800-555-3847 or reply YES to reverse.'",
+    "options": [
+      { "id": "a", "text": "Call the number in the text right away" },
+      { "id": "b", "text": "Reply YES to reverse the change" },
+      { "id": "c", "text": "Ignore both options and call your bank using the number on your card or official website" },
+      { "id": "d", "text": "Text back asking for more details" }
+    ],
+    "correctId": "c",
+    "explanation": "Both options in the text lead to the attacker — the phone number is fraudulent and replying YES may trigger further attacks. Always contact your bank independently using official contact information you source yourself.",
+    "points": 150,
+    "tip": "Never use contact information provided in a suspicious message. Always independently look up official numbers from the company's real website or the back of your card."
+  },
+  {
+    "id": "q018",
+    "attackType": "smishing",
+    "difficulty": "analyst",
+    "scenario": "You receive a text: 'TSA PreCheck: Your membership has expired. Renew in the next 48 hours to keep your trusted traveler status: tsa-precheck-renewal.com/renew'",
+    "options": [
+      { "id": "a", "text": "Click the link — you travel frequently and need PreCheck" },
+      { "id": "b", "text": "Click the link but only enter your name to check your status" },
+      { "id": "c", "text": "Go directly to tsa.gov to check your PreCheck status" },
+      { "id": "d", "text": "Reply HELP to get more information" }
+    ],
+    "correctId": "c",
+    "explanation": "TSA PreCheck renewals are managed through the official TSA website at tsa.gov. The government never sends renewal reminders via unofficial SMS links. 'tsa-precheck-renewal.com' is a phishing site.",
+    "points": 150,
+    "tip": "Government agencies never send renewal notices via SMS with unofficial links. Always manage government program renewals through official .gov websites."
+  },
+  {
+    "id": "q019",
+    "attackType": "smishing",
+    "difficulty": "expert",
+    "scenario": "Your CEO texts you from their personal mobile number you have saved: 'Hey, I'm in back-to-back meetings. Can you grab $500 in Google Play gift cards for a client gift? I'll reimburse you. Send me the codes when done.'",
+    "options": [
+      { "id": "a", "text": "Buy the gift cards — it came from the CEO's saved number" },
+      { "id": "b", "text": "Ask the CEO to approve it via email first" },
+      { "id": "c", "text": "Call the CEO directly to verify — gift card requests are a hallmark of fraud regardless of the source" },
+      { "id": "d", "text": "Buy half the amount to show goodwill" }
+    ],
+    "correctId": "c",
+    "explanation": "Gift card scams are extremely common even when appearing to come from known numbers — phones can be cloned or SIM-swapped. No legitimate business transaction is conducted via gift cards. This is a smishing/impersonation hybrid attack.",
+    "points": 200,
+    "tip": "Gift card requests are ALWAYS a red flag regardless of who appears to be asking. No legitimate business or government agency uses gift cards as payment."
+  },
+  {
+    "id": "q020",
+    "attackType": "smishing",
+    "difficulty": "expert",
+    "scenario": "You receive a text with a one-time code: 'Your verification code is 847291. Never share this code with anyone.' Moments later someone calls saying they accidentally sent the code to your number and asks you to read it back.",
+    "options": [
+      { "id": "a", "text": "Read them the code — it was a mistake and you're being helpful" },
+      { "id": "b", "text": "Text the code back instead of saying it out loud" },
+      { "id": "c", "text": "Hang up and never share the code — this is an account takeover attack" },
+      { "id": "d", "text": "Ask for their email address to send the code securely" }
+    ],
+    "correctId": "c",
+    "explanation": "This is an account takeover attack. The attacker is trying to log into your account and triggered the 2FA code to be sent to you. They're now social engineering you into giving it to them. OTP codes should NEVER be shared with anyone.",
+    "points": 200,
+    "tip": "One-time passwords sent to your number are for YOUR use only. Anyone calling to 'retrieve' a code they 'accidentally' sent you is attempting an account takeover."
+  },
+  {
+    "id": "q021",
+    "attackType": "baiting",
+    "difficulty": "rookie",
+    "scenario": "You find a USB drive in the company parking lot labeled 'Q4 Salary Review - Confidential'. You're curious what's on it. What do you do?",
+    "options": [
+      { "id": "a", "text": "Plug it into your work computer to see what's on it" },
+      { "id": "b", "text": "Plug it into a personal device instead so work systems are safe" },
+      { "id": "c", "text": "Hand it in to IT security without plugging it in anywhere" },
+      { "id": "d", "text": "Leave it where you found it" }
+    ],
+    "correctId": "c",
+    "explanation": "This is a classic baiting attack. Attackers deliberately drop USB drives in high-traffic areas with enticing labels to exploit human curiosity. These drives often contain auto-executing malware. Never plug in unknown drives.",
+    "points": 100,
+    "tip": "Dropped USB drives are a well-documented attack vector. Studies show over 45% of people plug in USB drives they find. Always hand unknown drives to IT without connecting them."
+  },
+  {
+    "id": "q022",
+    "attackType": "baiting",
+    "difficulty": "rookie",
+    "scenario": "A pop-up appears while browsing: 'Your computer is infected with 3 viruses! Your antivirus has expired. Click here to download our FREE security scanner to remove threats immediately.'",
+    "options": [
+      { "id": "a", "text": "Download the scanner — it looks like a real Windows alert" },
+      { "id": "b", "text": "Click the X to close and then download a trusted antivirus from their official site" },
+      { "id": "c", "text": "Close the entire browser using Task Manager and run a scan with your existing legitimate antivirus" },
+      { "id": "d", "text": "Call the support number shown in the pop-up" }
+    ],
+    "correctId": "c",
+    "explanation": "This is scareware — a form of baiting that uses fear to trick you into installing malware disguised as security software. The X button on the pop-up may itself trigger a download. Real antivirus software does not warn you through browser pop-ups.",
+    "points": 100,
+    "tip": "Real security warnings never appear as browser pop-ups. Close suspicious pop-ups via Task Manager and never call phone numbers shown in browser alerts."
+  },
+  {
+    "id": "q023",
+    "attackType": "baiting",
+    "difficulty": "analyst",
+    "scenario": "A colleague shares a pirated copy of an expensive software tool your team needs via a file-sharing link, saying it saves the company money. The installer asks for admin privileges.",
+    "options": [
+      { "id": "a", "text": "Install it — the company saves money and you get the tool you need" },
+      { "id": "b", "text": "Install it but decline the admin privileges request" },
+      { "id": "c", "text": "Decline and request the software through official IT procurement channels" },
+      { "id": "d", "text": "Install it on a personal device first to test it" }
+    ],
+    "correctId": "c",
+    "explanation": "Pirated software is a primary malware delivery vector. Cracked installers frequently contain trojans, ransomware, or keyloggers hidden inside the legitimate software. Requesting admin privileges is a major red flag.",
+    "points": 150,
+    "tip": "Pirated software is one of the most common ways malware enters organizations. Free versions of paid software are almost never actually free."
+  },
+  {
+    "id": "q024",
+    "attackType": "baiting",
+    "difficulty": "expert",
+    "scenario": "You receive a physical package at the office containing branded merchandise and a QR code card saying 'Scan to register your gift and receive exclusive offers from our partnership program.'",
+    "options": [
+      { "id": "a", "text": "Scan the QR code — it's a legitimate partnership gift" },
+      { "id": "b", "text": "Scan it on your personal phone to keep work systems safe" },
+      { "id": "c", "text": "Report the package to your security team — unsolicited packages with QR codes are a known attack vector" },
+      { "id": "d", "text": "Only scan if your colleagues also received one" }
+    ],
+    "correctId": "c",
+    "explanation": "Physical package baiting attacks have increased significantly. QR codes can direct to malicious sites that exploit mobile browsers or harvest credentials. Unsolicited packages with QR codes should always be reported to your security team.",
+    "points": 200,
+    "tip": "QR code attacks (quishing) are growing rapidly. Treat unsolicited physical packages with QR codes the same way you'd treat a suspicious USB drive."
+  },
+  {
+    "id": "q025",
+    "attackType": "pretexting",
+    "difficulty": "analyst",
+    "scenario": "Someone calls claiming to be an auditor from your company's external accounting firm. They have your manager's name, the firm's name, and reference a real ongoing audit. They ask for access to financial records 'to complete the review before the deadline'.",
+    "options": [
+      { "id": "a", "text": "Provide access — they know too many details to be fake" },
+      { "id": "b", "text": "Ask them to email you the request formally" },
+      { "id": "c", "text": "Tell them you'll verify their identity through your manager and the firm's official contact number before providing any access" },
+      { "id": "d", "text": "Give read-only access as a compromise" }
+    ],
+    "correctId": "c",
+    "explanation": "This is pretexting — constructing a fabricated scenario to extract information. The attacker has done reconnaissance to gather believable details. Knowing someone's name or an audit reference doesn't make them who they claim. Always verify through independent channels.",
+    "points": 150,
+    "tip": "In pretexting attacks, the more convincing the story, the more suspicious you should be. Always verify through independently sourced contact details."
+  },
+  {
+    "id": "q026",
+    "attackType": "pretexting",
+    "difficulty": "analyst",
+    "scenario": "A person in a uniform arrives at your office saying they're from the building's internet provider and need to access the server room to 'upgrade the fiber connection'. They have a clipboard, branded uniform, and a work order.",
+    "options": [
+      { "id": "a", "text": "Let them in — they have a uniform and work order" },
+      { "id": "b", "text": "Escort them to the server room but stay with them" },
+      { "id": "c", "text": "Ask them to wait and call the internet provider directly using the number on your bill to verify the work order" },
+      { "id": "d", "text": "Let them in but take a photo of their ID first" }
+    ],
+    "correctId": "c",
+    "explanation": "Uniforms, clipboards, and work orders are all easily fabricated. Physical social engineering attacks use authority and props to bypass security. Always verify unexpected maintenance visits by calling the vendor directly using contact details you source independently.",
+    "points": 150,
+    "tip": "Physical props like uniforms and work orders are easy to fake. Always verify unexpected service visits through independently sourced vendor contact numbers."
+  },
+  {
+    "id": "q027",
+    "attackType": "pretexting",
+    "difficulty": "expert",
+    "scenario": "A contractor has worked near your team for weeks, joined lunches, and learned everyone's names and roles. One day they ask to borrow your access badge 'just for 10 minutes' while theirs is being reprinted.",
+    "options": [
+      { "id": "a", "text": "Lend them the badge — you know them well by now" },
+      { "id": "b", "text": "Walk them to where they need to go yourself while keeping the badge" },
+      { "id": "c", "text": "Decline and direct them to reception or security to get a temporary pass — never share access credentials" },
+      { "id": "d", "text": "Lend it but stay nearby so you can watch" }
+    ],
+    "correctId": "c",
+    "explanation": "This is a long-con pretexting and tailgating attack. The weeks of relationship-building are deliberate. Access badges are personal credentials and should never be shared regardless of how well you know someone.",
+    "points": 200,
+    "tip": "Access credentials are never transferable. Social familiarity is a tool attackers use deliberately over time. Direct anyone needing access to official security channels — no exceptions."
+  },
+  {
+    "id": "q028",
+    "attackType": "pretexting",
+    "difficulty": "expert",
+    "scenario": "You get a LinkedIn message from someone claiming to be a journalist writing about your industry. They ask detailed questions about your company's security practices, incident response procedures, and what software your team uses.",
+    "options": [
+      { "id": "a", "text": "Answer the questions — it's good publicity for the company" },
+      { "id": "b", "text": "Answer general questions but skip the technical ones" },
+      { "id": "c", "text": "Decline to discuss internal security practices and direct them to your company's PR or communications team" },
+      { "id": "d", "text": "Answer but ask them not to publish your name" }
+    ],
+    "correctId": "c",
+    "explanation": "Information about security practices, software stack, and incident procedures is exactly what attackers need to craft targeted attacks. Internal security information should always go through official channels.",
+    "points": 200,
+    "tip": "Discussing internal security practices with unverified external parties is a significant security risk. Always route media inquiries through your PR or communications team."
+  }
+]

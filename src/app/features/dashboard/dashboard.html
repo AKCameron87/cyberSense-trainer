@@ -1,0 +1,181 @@
+<div class="min-h-screen bg-cyber-dark text-white page-enter">
+<div class="min-h-screen bg-cyber-dark text-white">
+
+  <!-- Background -->
+  <div class="fixed inset-0 pointer-events-none z-0">
+    <div class="grid-bg"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="relative z-10 flex items-center justify-between px-8 py-5 border-b border-cyber-border">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-cyber-accent flex items-center justify-center text-cyber-dark font-bold text-lg">
+        CS
+      </div>
+      <h1 class="text-lg font-bold tracking-widest">CYBERSENSE</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <button (click)="goHome()" class="btn-secondary text-sm px-4 py-2">← Home</button>
+    </div>
+  </header>
+
+  <div class="relative z-10 max-w-5xl mx-auto px-6 py-10">
+
+    <!-- Page title -->
+    <div class="mb-10">
+      <h2 class="text-3xl font-bold mb-1">Your Dashboard</h2>
+      <p class="text-cyber-muted">
+        Last played: {{ formatDate(progress?.lastPlayed ?? null) }}
+      </p>
+    </div>
+
+    <!-- No activity state -->
+    <div *ngIf="!hasPlayed()" class="text-center py-20">
+      <span class="text-6xl mb-4 block">🛡️</span>
+      <h3 class="text-2xl font-bold mb-2">No sessions yet</h3>
+      <p class="text-cyber-muted mb-8">Complete your first training session to see your stats here.</p>
+      <div class="flex gap-4 justify-center">
+        <button (click)="playPhishing()" class="btn-primary">Start Phishing Sim →</button>
+        <button (click)="playQuiz()" class="btn-secondary">Start Quiz →</button>
+      </div>
+    </div>
+
+    <!-- Stats content -->
+    <div *ngIf="hasPlayed()">
+
+      <!-- Top stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="card text-center py-5">
+          <p [class]="'text-3xl font-bold ' + getAccuracyColor()">{{ accuracy }}%</p>
+          <p class="text-cyber-muted text-xs mt-1 uppercase tracking-wider">Accuracy</p>
+        </div>
+        <div class="card text-center py-5">
+          <p class="text-3xl font-bold text-cyber-accent">{{ progress?.totalPoints }}</p>
+          <p class="text-cyber-muted text-xs mt-1 uppercase tracking-wider">Total Points</p>
+        </div>
+        <div class="card text-center py-5">
+          <p class="text-3xl font-bold text-cyber-green">{{ progress?.totalCorrect }}</p>
+          <p class="text-cyber-muted text-xs mt-1 uppercase tracking-wider">Correct Answers</p>
+        </div>
+        <div class="card text-center py-5">
+          <p class="text-3xl font-bold text-cyber-yellow">{{ progress?.totalSessions }}</p>
+          <p class="text-cyber-muted text-xs mt-1 uppercase tracking-wider">Sessions</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+
+        <!-- Category breakdown -->
+        <div class="card">
+          <h3 class="font-bold mb-4">Performance by Category</h3>
+          <div *ngIf="progress?.categoryScores?.length === 0" class="text-cyber-muted text-sm">
+            No category data yet. Complete more sessions!
+          </div>
+          <div class="space-y-3">
+            <div *ngFor="let cat of progress?.categoryScores" class="space-y-1">
+              <div class="flex justify-between text-sm">
+                <span class="capitalize">{{ cat.category }}</span>
+                <span class="text-cyber-muted">{{ cat.correct }}/{{ cat.total }} · {{ cat.percentage }}%</span>
+              </div>
+              <div class="h-2 bg-cyber-border rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full transition-all duration-700"
+                  [class]="getCategoryColor(cat)"
+                  [style.width.%]="cat.percentage">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent sessions -->
+        <div class="card">
+          <h3 class="font-bold mb-4">Recent Sessions</h3>
+          <div *ngIf="recentSessions.length === 0" class="text-cyber-muted text-sm">
+            No sessions recorded yet.
+          </div>
+          <div class="space-y-2">
+            <div *ngFor="let session of recentSessions"
+                 class="session-row">
+              <span class="text-xl">{{ getSessionIcon(session.mode) }}</span>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium truncate">{{ getSessionLabel(session.mode) }}</p>
+                <p class="text-xs text-cyber-muted">{{ formatDate(session.startedAt) }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm font-bold text-cyber-accent">{{ session.totalScore }} pts</p>
+                <p [class]="'text-xs ' + getSessionResultColor(session)">
+                  {{ getSessionResult(session) }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Weakest area -->
+      <div *ngIf="weakestArea && weakestArea.percentage < 75" class="weak-card mb-8">
+        <div class="flex items-start gap-4">
+          <span class="text-3xl">🎯</span>
+          <div>
+            <h3 class="font-bold text-cyber-yellow mb-1">
+              Focus Area: {{ weakestArea.category | titlecase }}
+            </h3>
+            <p class="text-cyber-muted text-sm">
+              Your weakest category at {{ weakestArea.percentage }}% accuracy.
+              Try targeting this attack type in your next session.
+            </p>
+            <button (click)="playQuiz()" class="btn-secondary text-sm mt-3 px-4 py-2">
+              Practice Now →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div class="card mb-8">
+        <h3 class="font-bold mb-5">
+          Badges
+          <span class="text-cyber-muted text-sm font-normal ml-2">
+            {{ earnedBadges.length }} / {{ (progress?.badges?.length ?? 0) }} earned
+          </span>
+        </h3>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <!-- Earned -->
+          <div *ngFor="let badge of earnedBadges" class="badge-earned">
+            <span class="text-3xl">{{ badge.icon }}</span>
+            <div>
+              <p class="font-bold text-sm">{{ badge.label }}</p>
+              <p class="text-xs text-cyber-muted">{{ badge.description }}</p>
+              <p class="text-xs text-cyber-green mt-1">Earned {{ formatDate(badge.earnedAt) }}</p>
+            </div>
+          </div>
+          <!-- Locked -->
+          <div *ngFor="let badge of lockedBadges" class="badge-locked">
+            <span class="text-3xl opacity-30">{{ badge.icon }}</span>
+            <div>
+              <p class="font-bold text-sm text-cyber-muted">{{ badge.label }}</p>
+              <p class="text-xs text-cyber-muted opacity-60">{{ badge.description }}</p>
+              <p class="text-xs text-cyber-border mt-1">🔒 Locked</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="flex flex-wrap gap-4 justify-between items-center">
+        <div class="flex gap-3">
+          <button (click)="playPhishing()" class="btn-primary">🎣 Phishing Sim</button>
+          <button (click)="playQuiz()" class="btn-primary">🧠 Social Eng Quiz</button>
+        </div>
+        <button (click)="resetProgress()"
+                class="text-cyber-red text-sm hover:underline opacity-60 hover:opacity-100 transition-opacity">
+          Reset All Progress
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
