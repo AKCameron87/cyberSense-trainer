@@ -1,0 +1,417 @@
+[
+  {
+    "id": "p001",
+    "type": "email",
+    "difficulty": "rookie",
+    "title": "Fake PayPal Suspension Notice",
+    "description": "Read this email carefully. Click on anything that looks suspicious to flag it as a red flag.",
+    "category": "Credential Harvesting",
+    "subject": "Your PayPal account has been suspended",
+    "senderEmail": "support@paypa1-security.com",
+    "totalPoints": 400,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-sender",
+        "description": "Fake sender domain — 'paypa1-security.com' uses the number '1' instead of the letter 'l'",
+        "points": 100
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-urgency",
+        "description": "Artificial urgency — '24 hours' deadline is designed to panic you into acting without thinking",
+        "points": 100
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-link",
+        "description": "Suspicious link — legitimate PayPal emails link to paypal.com, not third-party domains",
+        "points": 100
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-footer",
+        "description": "Fake footer — '1 Fake Street, Scammer City' and 'PayPa1 Inc.' confirm this is fraudulent",
+        "points": 100
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'><div style='background: #003087; padding: 15px; text-align: center;'><span style='color: white; font-size: 24px; font-weight: bold;'>PayPa1</span></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Dear Valued Customer,</p><p>We have detected unusual activity on your account and have <strong id='rf-urgency' style='color: #c00; cursor: pointer;'>temporarily suspended</strong> your access for your protection.</p><p>To restore access, you must verify your identity within 24 hours or your account will be <strong>permanently closed</strong>.</p><p><a id='rf-link' href='#' style='display: inline-block; background: #0070ba; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;'>Verify My Account Now</a></p><p>If you do not verify, we will be forced to permanently limit your account.</p><p>Thank you,<br>PayPal Security Team</p></div><div id='rf-footer' style='padding: 10px; font-size: 11px; color: #666; border-top: 1px solid #ddd; cursor: pointer;'>© 2024 PayPa1 Inc. All rights reserved. | 1 Fake Street, Scammer City</div></div>"
+  },
+  {
+    "id": "p002",
+    "type": "email",
+    "difficulty": "rookie",
+    "title": "IT Password Reset Scam",
+    "description": "Your IT department appears to be asking you to reset your password. Spot the red flags.",
+    "category": "Credential Harvesting",
+    "subject": "URGENT: Reset your password before 5PM today",
+    "senderEmail": "it-support@company-helpdesk.net",
+    "totalPoints": 400,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-sender",
+        "description": "External domain — 'company-helpdesk.net' is not your company's official IT domain",
+        "points": 100
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-urgency",
+        "description": "Pressure deadline — forcing a same-day action is a manipulation tactic",
+        "points": 100
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-threat",
+        "description": "Threatening language — 'locked out of all systems' is designed to create fear",
+        "points": 100
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-link",
+        "description": "Suspicious reset link — goes to an external domain, not your company's systems",
+        "points": 100
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'><div style='background: #1a1a2e; padding: 15px;'><span style='color: #00d4ff; font-size: 18px; font-weight: bold;'>🔒 IT Security Department</span></div><div style='padding: 20px; border: 1px solid #ddd;'><p>Dear Employee,</p><p id='rf-urgency' style='cursor: pointer;'>This is an <strong style='color: #c00;'>URGENT</strong> notification requiring your immediate action today before <strong>5:00 PM</strong>.</p><p id='rf-threat' style='cursor: pointer; background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107;'>Failure to comply will result in your account being <strong>locked out of all company systems</strong> including email, VPN, and internal tools.</p><p>Please click the button below to reset your password:</p><a id='rf-link' href='#' style='display: inline-block; background: #e94560; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px;'>Reset Password Now →</a><p style='font-size: 12px; color: #999; margin-top: 20px;'>This link expires in 2 hours.</p></div></div>"
+  },
+  {
+    "id": "p003",
+    "type": "email",
+    "difficulty": "rookie",
+    "title": "Prize Winner Scam",
+    "description": "You've apparently won a prize. Find all the red flags in this email.",
+    "category": "Advance Fee Fraud",
+    "subject": "🎉 Congratulations! You've been selected as our winner!",
+    "senderEmail": "prizes@amazon-rewards-center.com",
+    "totalPoints": 400,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-sender",
+        "description": "Fake domain — 'amazon-rewards-center.com' is not Amazon's official domain (amazon.com)",
+        "points": 100
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-prize",
+        "description": "Unsolicited prize — you never entered this contest. Legitimate prizes require prior entry.",
+        "points": 100
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-fee",
+        "description": "Advance fee fraud — asking for payment to claim a prize is always a scam",
+        "points": 100
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-ccrequest",
+        "description": "Credit card request — no legitimate prize requires your full card details",
+        "points": 100
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #fffde7;'><div style='background: #ff9900; padding: 20px; text-align: center;'><span style='color: white; font-size: 26px; font-weight: bold;'>amazon</span><span style='color: #333; font-size: 12px; display: block;'>rewards center</span></div><div style='padding: 20px; text-align: center;'><p style='font-size: 28px;'>🎉🎊🏆</p><h2 id='rf-prize' style='color: #e47911; cursor: pointer;'>CONGRATULATIONS! You Are Our Lucky Winner!</h2><p>Your email address was randomly selected from millions of Amazon users to receive a <strong>$1,000 Amazon Gift Card</strong>!</p><div style='background: #fff3cd; border: 2px dashed #ffc107; padding: 15px; margin: 20px 0;'><p id='rf-fee' style='cursor: pointer;'>To claim your prize, a small <strong>processing and shipping fee of $4.99</strong> is required.</p><p id='rf-ccrequest' style='cursor: pointer;'>Please provide your credit card details below to complete your claim:</p><div style='text-align: left; padding: 10px;'><p>Card Number: ________________</p><p>CVV: _____ Expiry: ___/___</p></div></div><p style='font-size: 11px; color: #999;'>Offer expires in 24 hours. Act now!</p></div></div>"
+  },
+  {
+    "id": "p004",
+    "type": "email",
+    "difficulty": "analyst",
+    "title": "CEO Business Email Compromise",
+    "description": "This email appears to come from your CEO. Identify every red flag before taking action.",
+    "category": "Business Email Compromise",
+    "subject": "Confidential - Urgent Wire Transfer Needed",
+    "senderEmail": "smitchell@company-corp.co",
+    "totalPoints": 500,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-sender",
+        "description": "Lookalike domain — 'company-corp.co' mimics the real domain but uses .co instead of .com",
+        "points": 125
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-secrecy",
+        "description": "Secrecy request — 'do not discuss with anyone' is designed to prevent you from verifying",
+        "points": 125
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-urgency",
+        "description": "Artificial urgency — 'within the next 2 hours' prevents careful verification",
+        "points": 125
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-wire",
+        "description": "Unusual wire transfer request — executives never request wire transfers via email alone",
+        "points": 125
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'><div style='background: #f5f5f5; padding: 15px; border-bottom: 1px solid #ddd;'><p style='margin: 0; font-size: 13px; color: #666;'>From: Sarah Mitchell &lt;smitchell@company-corp.co&gt;</p></div><div style='padding: 20px;'><p>Hi,</p><p id='rf-urgency' style='cursor: pointer;'>I need you to process an urgent wire transfer today. I am currently in a board meeting and cannot be reached by phone.</p><p id='rf-secrecy' style='cursor: pointer; background: #fff3cd; padding: 8px; border-left: 3px solid #ffc107;'>Please do not discuss this with anyone else in the office as it is part of a <strong>confidential acquisition deal</strong>.</p><p>Please wire <strong id='rf-wire' style='cursor: pointer;'>$24,500 USD</strong> to the following account:</p><div style='background: #f9f9f9; border: 1px solid #ddd; padding: 15px; font-family: monospace; font-size: 13px;'><p>Bank: First International Bank<br>Account Name: Meridian Consulting LLC<br>Account No: 4821937465<br>Routing No: 021000021</p></div><p>This needs to be completed within the next 2 hours. I will explain everything after the meeting.</p><p>Thanks for handling this quickly.<br>Sarah<br><small style='color: #999;'>Sarah Mitchell | Chief Executive Officer<br>company-corp.co | Direct: +1 (555) 847-2910</small></p></div></div>"
+  },
+  {
+    "id": "p005",
+    "type": "email",
+    "difficulty": "analyst",
+    "title": "Microsoft Security Alert Spoof",
+    "description": "A security alert from Microsoft. Examine the email carefully for signs of fraud.",
+    "category": "Credential Harvesting",
+    "subject": "Action Required: Unusual sign-in activity on your Microsoft account",
+    "senderEmail": "account-security@microsoft-alerts.net",
+    "totalPoints": 500,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-sender",
+        "description": "Fake Microsoft domain — Microsoft emails come from @microsoft.com, not @microsoft-alerts.net",
+        "points": 125
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-location",
+        "description": "Fabricated location data — designed to create urgency and make the email seem personalized",
+        "points": 125
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-link",
+        "description": "Phishing link — hovering shows it goes to a non-Microsoft domain",
+        "points": 125
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-threat",
+        "description": "Account suspension threat — used to create fear and rushed decision-making",
+        "points": 125
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Segoe UI, Arial, sans-serif; max-width: 600px; margin: 0 auto;'><div style='background: #0078d4; padding: 20px; text-align: center;'><span style='color: white; font-size: 22px; font-weight: 300;'>Microsoft</span></div><div style='padding: 25px; border: 1px solid #e0e0e0;'><h2 style='color: #0078d4; font-weight: 300;'>Unusual sign-in activity</h2><p>We detected something unusual about a recent sign-in to your Microsoft account.</p><div style='background: #f5f5f5; padding: 15px; margin: 15px 0; font-size: 13px;'><p id='rf-location' style='cursor: pointer;'><strong>Location:</strong> Lagos, Nigeria<br><strong>Device:</strong> Unknown Windows Device<br><strong>Time:</strong> Today at 3:42 AM</p></div><p id='rf-threat' style='cursor: pointer; color: #c00;'>If you don't review this activity, your account <strong>may be suspended within 24 hours</strong>.</p><a id='rf-link' href='#' style='display: inline-block; background: #0078d4; color: white; padding: 12px 32px; text-decoration: none; font-size: 15px;'>Review Recent Activity</a><p style='font-size: 11px; color: #666; margin-top: 20px;'>Microsoft will never ask for your password in an email.</p></div></div>"
+  },
+  {
+    "id": "p006",
+    "type": "email",
+    "difficulty": "analyst",
+    "title": "HR Benefits Enrollment Phish",
+    "description": "An HR email about open enrollment. Identify what makes this email suspicious.",
+    "category": "Credential Harvesting",
+    "subject": "ACTION REQUIRED: Complete your benefits enrollment by Friday",
+    "senderEmail": "hr-benefits@employee-portal-2024.com",
+    "totalPoints": 500,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-sender",
+        "description": "External HR domain — your company's HR emails would come from your company's official domain",
+        "points": 125
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-urgency",
+        "description": "False deadline urgency — designed to prevent you from thinking carefully or verifying",
+        "points": 125
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-ssn",
+        "description": "SSN request — HR portals never ask for your full Social Security Number via email link",
+        "points": 125
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-link",
+        "description": "Suspicious portal link — goes to 'employee-portal-2024.com', not your company's official HR system",
+        "points": 125
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'><div style='background: #2c5f2e; padding: 15px; text-align: center;'><span style='color: white; font-size: 18px; font-weight: bold;'>HR Benefits Portal</span></div><div style='padding: 20px;'><p>Dear Employee,</p><p id='rf-urgency' style='cursor: pointer; background: #ffebee; padding: 10px; border-left: 4px solid #f44336;'><strong>IMPORTANT:</strong> Open enrollment closes this <strong>Friday at 5PM</strong>. Employees who do not complete enrollment will be automatically removed from all benefit plans.</p><p>To complete your enrollment please log into our secure benefits portal:</p><a id='rf-link' href='#' style='display: inline-block; background: #2c5f2e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; margin: 10px 0;'>Access Benefits Portal →</a><p id='rf-ssn' style='cursor: pointer; font-size: 13px; color: #555;'>You will need your <strong>Employee ID and full Social Security Number</strong> to verify your identity and complete enrollment.</p><p style='font-size: 12px; color: #999;'>If you have questions contact hr-benefits@employee-portal-2024.com</p></div></div>"
+  },
+  {
+    "id": "p007",
+    "type": "email",
+    "difficulty": "expert",
+    "title": "Compromised Colleague Attack",
+    "description": "An email from a real colleague. Look very carefully — something is wrong.",
+    "category": "Account Compromise",
+    "subject": "Quick favor - can you review this before our meeting?",
+    "senderEmail": "jchen@yourcompany.com",
+    "totalPoints": 600,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-link",
+        "description": "Subdomain spoofing — 'docs.google.com.sharepoint-viewer.io' is owned by 'sharepoint-viewer.io', not Google",
+        "points": 150
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-credential",
+        "description": "Credential request — legitimate shared documents don't ask for login credentials to view",
+        "points": 150
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-timing",
+        "description": "Suspicious timing — unexpected document requests right before meetings are a common lure",
+        "points": 150
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-preview",
+        "description": "No document preview — a real Google Doc link would show a recognizable preview, not a login page",
+        "points": 150
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'><div style='padding: 20px;'><p>Hey,</p><p id='rf-timing' style='cursor: pointer;'>Just wanted to send this over before our 2pm. I made some updates to the Q4 budget doc — can you take a quick look and let me know if the numbers look right to you?</p><p>Here's the link:</p><p id='rf-link' style='cursor: pointer;'><a href='#' style='color: #1a73e8;'>https://docs.google.com.sharepoint-viewer.io/view?file=budget_Q4_final.xlsx</a></p><p id='rf-credential' style='cursor: pointer; background: #e8f0fe; padding: 10px; border-radius: 4px; font-size: 13px;'>Note: You may need to sign in with your Google or Microsoft credentials to view the file.</p><p id='rf-preview' style='cursor: pointer; font-size: 12px; color: #666;'>[Document preview unavailable - click link to view]</p><p>Thanks!<br>James</p></div></div>"
+  },
+  {
+    "id": "p008",
+    "type": "email",
+    "difficulty": "expert",
+    "title": "Spear Phishing via LinkedIn Intel",
+    "description": "A highly targeted email that uses your real professional details. Find every red flag.",
+    "category": "Spear Phishing",
+    "subject": "Re: Your talk at the Cybersecurity Summit last week",
+    "senderEmail": "david.walsh@infosec-weekly.org",
+    "totalPoints": 600,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-sender",
+        "description": "Unverified publication domain — 'infosec-weekly.org' is not a recognized publication and cannot be verified",
+        "points": 150
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-osint",
+        "description": "OSINT-based personalization — using public LinkedIn/conference data to appear legitimate is a spear phishing hallmark",
+        "points": 150
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-attachment",
+        "description": "Unsolicited attachment — a .docx file from an unverified sender can contain malicious macros",
+        "points": 150
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-macro",
+        "description": "Macro enable request — asking to enable macros is a classic malware delivery technique",
+        "points": 150
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'><div style='padding: 20px;'><p>Hi,</p><p id='rf-osint' style='cursor: pointer;'>I attended your presentation on zero-trust architecture at last week's Cybersecurity Summit and found your insights on lateral movement prevention particularly compelling.</p><p>I'm a staff writer at InfoSec Weekly and I'm working on a feature article about enterprise security leaders. I'd love to include some of your thoughts.</p><p>I've drafted a few interview questions in the attached document — would you be able to take a look?</p><div id='rf-attachment' style='cursor: pointer; background: #f5f5f5; border: 1px solid #ddd; padding: 15px; border-radius: 4px; margin: 15px 0; display: flex; align-items: center; gap: 10px;'><span style='font-size: 24px;'>📄</span><div><p style='margin: 0; font-weight: bold;'>Interview_Questions_Final.docx</p><p id='rf-macro' style='margin: 0; font-size: 12px; color: #888; cursor: pointer;'>Note: Please enable macros when prompted to view formatted content</p></div></div><p>Looking forward to your response.</p><p>Best regards,<br>David Walsh<br><small style='color: #999;'>Staff Writer, InfoSec Weekly<br>infosec-weekly.org</small></p></div></div>"
+  },
+  {
+    "id": "p009",
+    "type": "fake-site",
+    "difficulty": "rookie",
+    "title": "Fake PayPal Login Page",
+    "description": "This appears to be a PayPal login page. Click on everything suspicious.",
+    "category": "Credential Harvesting",
+    "siteUrl": "paypa1-secure-login.com/signin",
+    "totalPoints": 400,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-url",
+        "description": "Fake domain — 'paypa1-secure-login.com' is not PayPal. The real site is paypal.com",
+        "points": 100
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-nossl",
+        "description": "No padlock/HTTPS indicator — a real payment site always has a valid SSL certificate shown in the browser",
+        "points": 100
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-password",
+        "description": "Password field on first page — PayPal separates login into two steps; combining them is a fake site pattern",
+        "points": 100
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-copyright",
+        "description": "Incorrect copyright — reads 'PayPa1' with the number 1 instead of the letter l",
+        "points": 100
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Arial, sans-serif; background: #f5f7fa; min-height: 500px; display: flex; align-items: center; justify-content: center; padding: 20px;'><div style='background: white; padding: 30px; border-radius: 8px; width: 100%; max-width: 400px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'><div style='text-align: center; margin-bottom: 20px;'><span style='color: #003087; font-size: 32px; font-weight: bold;'>PayPal</span></div><div id='rf-nossl' style='background: #fff3cd; border: 1px solid #ffc107; padding: 8px; border-radius: 4px; font-size: 12px; color: #856404; margin-bottom: 15px; cursor: pointer;'>🔓 Not Secure — paypa1-secure-login.com</div><input style='width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 15px;' placeholder='Email or mobile number'><input id='rf-password' style='width: 100%; box-sizing: border-box; padding: 12px; margin-bottom: 16px; border: 1px solid #ddd; border-radius: 4px; font-size: 15px; cursor: pointer;' type='password' placeholder='Password'><button style='width: 100%; background: #0070ba; color: white; border: none; padding: 14px; border-radius: 25px; font-size: 16px; cursor: pointer;'>Log In</button><p style='text-align: center; margin-top: 15px;'><a href='#' style='color: #0070ba; text-decoration: none; font-size: 14px;'>Forgot password?</a></p><hr style='margin: 20px 0;'><p id='rf-copyright' style='text-align: center; font-size: 11px; color: #999; cursor: pointer;'>© 2024 PayPa1, Inc. All rights reserved.</p><p id='rf-url' style='text-align: center; font-size: 10px; color: #bbb; cursor: pointer;'>paypa1-secure-login.com</p></div></div>"
+  },
+  {
+    "id": "p010",
+    "type": "fake-site",
+    "difficulty": "analyst",
+    "title": "Fake Microsoft 365 Login",
+    "description": "A Microsoft 365 login page. Examine every detail carefully.",
+    "category": "Credential Harvesting",
+    "siteUrl": "login.microsoft365-auth.net/common/oauth2",
+    "totalPoints": 500,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-url",
+        "description": "Fake domain — 'microsoft365-auth.net' is not Microsoft. Real Microsoft login is login.microsoftonline.com",
+        "points": 125
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-logo",
+        "description": "Slightly off logo — the Microsoft logo colors are subtly incorrect on fake sites",
+        "points": 125
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-preloaded",
+        "description": "Pre-filled email — your email being pre-filled means the attacker already knows it and targeted you specifically",
+        "points": 125
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-footer",
+        "description": "Missing legal links — fake sites often omit or have broken Terms of Use and Privacy links",
+        "points": 125
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Segoe UI, Arial, sans-serif; background: #f2f2f2; min-height: 500px; display: flex; align-items: center; justify-content: center;'><div style='background: white; width: 100%; max-width: 440px; padding: 44px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);'><div id='rf-logo' style='cursor: pointer; margin-bottom: 16px;'><svg width='108' height='24' viewBox='0 0 108 24'><rect x='0' y='0' width='10' height='10' fill='#f14'/><rect x='12' y='0' width='10' height='10' fill='#8bc'/><rect x='0' y='12' width='10' height='10' fill='#0a0'/><rect x='12' y='12' width='10' height='10' fill='#fb0'/><text x='26' y='18' font-family='Segoe UI' font-size='18' fill='#737373'>Microsoft</text></svg></div><h1 style='font-size: 24px; font-weight: 600; margin-bottom: 16px; color: #1b1b1b;'>Sign in</h1><input id='rf-preloaded' style='width: 100%; box-sizing: border-box; padding: 6px 10px; border: 1px solid #8a8a8a; margin-bottom: 16px; font-size: 15px; cursor: pointer;' value='your.email@company.com' readonly><a href='#' style='font-size: 13px; color: #0067b8; text-decoration: none;'>Can&apos;t access your account?</a><button style='display: block; width: 100%; background: #0067b8; color: white; border: none; padding: 6px 10px; font-size: 15px; margin-top: 40px; cursor: pointer;'>Next</button><div id='rf-footer' style='margin-top: 16px; font-size: 12px; cursor: pointer;'><span style='color: #aaa;'>Terms of use</span><span style='color: #aaa; margin: 0 6px;'>|</span><span style='color: #aaa;'>Privacy &amp; cookies</span></div><div id='rf-url' style='font-size: 10px; color: #bbb; margin-top: 8px; cursor: pointer;'>microsoft365-auth.net</div></div></div>"
+  },
+  {
+    "id": "p011",
+    "type": "fake-site",
+    "difficulty": "expert",
+    "title": "Cloned Banking Portal",
+    "description": "This bank login page looks very convincing. Find the subtle red flags.",
+    "category": "Credential Harvesting",
+    "siteUrl": "secure.firstnationalbank.com.account-verify.net/login",
+    "totalPoints": 600,
+    "redFlags": [
+      {
+        "id": "rf1",
+        "elementId": "rf-url",
+        "description": "Subdomain spoofing — the real domain is 'account-verify.net', not 'firstnationalbank.com'. Read URLs right-to-left.",
+        "points": 150
+      },
+      {
+        "id": "rf2",
+        "elementId": "rf-cert",
+        "description": "Wrong SSL certificate — the padlock is present but the certificate is issued to 'account-verify.net', not the bank",
+        "points": 150
+      },
+      {
+        "id": "rf3",
+        "elementId": "rf-extra",
+        "description": "Excessive data collection — real bank logins never ask for your full debit card number on the login page",
+        "points": 150
+      },
+      {
+        "id": "rf4",
+        "elementId": "rf-help",
+        "description": "Broken help links — fake sites often have non-functional navigation links that go nowhere",
+        "points": 150
+      }
+    ],
+    "bodyHtml": "<div style='font-family: Arial, sans-serif; background: #003366; min-height: 500px; display: flex; flex-direction: column; align-items: center; padding: 20px;'><div style='color: white; font-size: 22px; font-weight: bold; padding: 15px 0;'>🏦 First National Bank</div><div style='background: white; width: 100%; max-width: 420px; padding: 30px; border-radius: 4px;'><h2 style='color: #003366; margin-top: 0;'>Online Banking Login</h2><div id='rf-cert' style='font-size: 12px; color: #666; margin-bottom: 15px; cursor: pointer;'>🔒 account-verify.net [Certificate Details]</div><label style='font-size: 13px; color: #333;'>Username</label><input style='width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #ccc; margin-bottom: 12px; margin-top: 4px;'><label style='font-size: 13px; color: #333;'>Password</label><input type='password' style='width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #ccc; margin-bottom: 12px; margin-top: 4px;'><div id='rf-extra' style='cursor: pointer; background: #f9f9f9; border: 1px solid #e0e0e0; padding: 12px; margin-bottom: 12px; border-radius: 4px;'><label style='font-size: 13px; color: #333;'>Debit Card Number (for verification)</label><input style='width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #ccc; margin-top: 4px;' placeholder='#### #### #### ####'></div><button style='width: 100%; background: #003366; color: white; border: none; padding: 12px; font-size: 15px; cursor: pointer; border-radius: 4px;'>Sign In Securely</button><div id='rf-help' style='margin-top: 15px; text-align: center; cursor: pointer;'><a href='#' style='color: #003366; font-size: 13px; text-decoration: none;'>Help</a> | <a href='#' style='color: #003366; font-size: 13px; text-decoration: none;'>Privacy Policy</a> | <a href='#' style='color: #003366; font-size: 13px; text-decoration: none;'>Contact Us</a></div></div><div id='rf-url' style='color: #aac; font-size: 11px; margin-top: 10px; cursor: pointer;'>secure.firstnationalbank.com.account-verify.net</div></div>"
+  }
+]
