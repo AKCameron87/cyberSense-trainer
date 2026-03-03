@@ -1,4 +1,4 @@
-import{p as u}from"./chunk-5O7KERED.js";var p=class c{API_URL="http://localhost:3001/v1/messages";MODEL="claude-sonnet-4-20250514";async generatePhishingScenario(i,e=[]){let o=e.length?`Do NOT generate any of these scenarios: ${e.join(", ")}.`:"",n=`Generate a realistic phishing simulation scenario for a cybersecurity training app.
+import{p as u}from"./chunk-5O7KERED.js";var p=class c{API_URL=window.location.hostname==="localhost"?"http://localhost:3001/v1/messages":null;MODEL="claude-sonnet-4-20250514";async generatePhishingScenario(i,e=[]){let o=e.length?`Do NOT generate any of these scenarios: ${e.join(", ")}.`:"",n=`Generate a realistic phishing simulation scenario for a cybersecurity training app.
 Difficulty: ${i}
 ${o}
 
