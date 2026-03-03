@@ -1,6 +1,6 @@
 # 🛡️ CyberSense Trainer
 
-A full-stack cybersecurity awareness training application built with Angular. Train your instincts against real-world phishing attacks, social engineering tactics, and more — with both hand-crafted and AI-generated scenarios.
+A full-stack cybersecurity awareness training application built with Angular and Firebase. Train your instincts against real-world phishing attacks, social engineering tactics, and more — with both hand-crafted and AI-generated scenarios.
 
 🔗 **Live Demo:** [https://AKCameron87.github.io/cyberSense-trainer/](https://AKCameron87.github.io/cyberSense-trainer/)
 
@@ -13,9 +13,11 @@ A full-stack cybersecurity awareness training application built with Angular. Tr
 - [Game Modes](#game-modes)
 - [Difficulty Levels](#difficulty-levels)
 - [AI Mode](#ai-mode)
+- [Authentication](#authentication)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
+- [Firebase Setup](#firebase-setup)
 - [Running the Proxy Server](#running-the-proxy-server)
 - [Deployment](#deployment)
 - [Roadmap](#roadmap)
@@ -26,7 +28,7 @@ A full-stack cybersecurity awareness training application built with Angular. Tr
 
 CyberSense Trainer is an interactive security awareness training platform designed to help users recognise and respond to common cyber threats. It simulates real-world attack scenarios including phishing emails, fake websites, vishing calls, smishing texts, baiting, and pretexting — across three difficulty tiers.
 
-Users earn points, unlock badges, track their progress over time, and can export a PDF training report. An AI mode powered by the Claude API generates fresh, unique scenarios every session so no two playthroughs are ever the same.
+Users can create an account to sync their progress across devices, compete on the global leaderboard, earn badges, and export a full PDF training report. An AI mode powered by the Claude API generates fresh, unique scenarios every session so no two playthroughs are ever the same.
 
 ---
 
@@ -34,12 +36,14 @@ Users earn points, unlock badges, track their progress over time, and can export
 
 - 🎣 **Phishing Simulator** — Click on red flags inside realistic phishing emails and fake websites
 - 🧠 **Social Engineering Quiz** — Multiple choice scenarios covering 5 attack types
-- 🏆 **Badge System** — Earn badges for performance and milestones
+- 🏆 **Global Leaderboard** — Compete with other trainers worldwide
+- 👤 **User Accounts** — Sign in with Google or email/password
+- ☁️ **Cloud Sync** — Progress saved to Firestore and synced across devices
+- 🥇 **Badge System** — Earn badges for performance and milestones
 - 📊 **Dashboard** — Track total points, accuracy, sessions, and category breakdown
 - 📄 **PDF Export** — Download a full training report after each session
 - 🤖 **AI Generated Scenarios** — Infinitely unique content powered by Claude AI
 - 🎨 **Page Transitions** — Smooth animations between routes
-- 💾 **Progress Persistence** — Progress saved locally via localStorage
 
 ---
 
@@ -87,15 +91,34 @@ Toggle **AI Generated Scenarios** on the home screen to enable dynamically gener
 
 ---
 
+## Authentication
+
+CyberSense Trainer supports user accounts via Firebase Authentication.
+
+**Sign in options:**
+- Google (one-click)
+- Email and password
+
+**What an account unlocks:**
+- Cloud sync — progress saved to Firestore and available on any device
+- Global leaderboard — your scores are submitted after each session
+- Persistent rank tracking across sessions
+
+Signing in is optional. The app is fully playable without an account using local browser storage.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Angular 17+ (Standalone Components) |
+| Framework | Angular 21 (Standalone Components) |
 | Styling | Tailwind CSS |
 | Language | TypeScript |
+| Authentication | Firebase Authentication |
+| Database | Cloud Firestore |
 | AI Integration | Anthropic Claude API (claude-sonnet-4) |
-| Storage | localStorage (browser) |
+| Storage | Firestore (cloud) + localStorage (fallback) |
 | Deployment | GitHub Pages via angular-cli-ghpages |
 | Proxy Server | Node.js (http/https) |
 
@@ -107,6 +130,7 @@ Toggle **AI Generated Scenarios** on the home screen to enable dynamically gener
 
 - Node.js v18+
 - Angular CLI (`npm install -g @angular/cli`)
+- A Firebase project (for auth and leaderboard)
 - An Anthropic API key (for AI mode only — [console.anthropic.com](https://console.anthropic.com))
 
 ### Installation
@@ -117,7 +141,7 @@ git clone https://github.com/AKCameron87/cyberSense-trainer.git
 cd cyberSense-trainer
 
 # Install dependencies
-npm install
+npm install --legacy-peer-deps
 
 # Start the development server
 ng serve
@@ -133,23 +157,78 @@ Open your browser at `http://localhost:4200`
 src/
 ├── app/
 │   ├── core/
-│   │   ├── models/           # TypeScript interfaces and enums
+│   │   ├── firebase.config.ts           # Firebase configuration
+│   │   ├── models/                      # TypeScript interfaces and enums
 │   │   └── services/
 │   │       ├── scenario.service.ts      # Loads static JSON scenarios
 │   │       ├── progress.service.ts      # Tracks user progress & badges
-│   │       └── ai-scenario.service.ts   # Generates AI scenarios via Claude API
+│   │       ├── ai-scenario.service.ts   # Generates AI scenarios via Claude API
+│   │       ├── auth.service.ts          # Firebase Authentication
+│   │       └── firestore.service.ts     # Firestore read/write operations
 │   └── features/
 │       ├── home/             # Landing page with difficulty & mode selection
+│       ├── auth/             # Login & registration page
 │       ├── phishing-sim/     # Phishing simulation game mode
 │       ├── social-eng-quiz/  # Social engineering quiz game mode
 │       ├── results/          # Post-session results & PDF export
-│       └── dashboard/        # Progress tracking dashboard
+│       ├── dashboard/        # Progress tracking dashboard
+│       └── leaderboard/      # Global rankings
 ├── assets/
 │   └── data/
 │       ├── phishing-scenarios.json   # 11 hand-crafted phishing scenarios
 │       └── quiz-scenarios.json       # 28 hand-crafted quiz questions
-└── styles.css                # Global styles & Tailwind config
+└── styles.css                        # Global styles & Tailwind config
 ```
+
+---
+
+## Firebase Setup
+
+To run this project locally with Firebase features enabled:
+
+1. Go to [console.firebase.google.com](https://console.firebase.google.com) and create a project
+2. Enable **Authentication** → **Google** and **Email/Password** providers
+3. Enable **Firestore Database** in test mode
+4. Register a web app and copy the `firebaseConfig`
+5. Create `src/app/core/firebase.config.ts`:
+
+```ts
+export const firebaseConfig = {
+  apiKey:            'YOUR_API_KEY',
+  authDomain:        'YOUR_PROJECT.firebaseapp.com',
+  projectId:         'YOUR_PROJECT_ID',
+  storageBucket:     'YOUR_PROJECT.firebasestorage.app',
+  messagingSenderId: 'YOUR_SENDER_ID',
+  appId:             'YOUR_APP_ID'
+};
+```
+
+> 🔒 Never commit `firebase.config.ts` with real credentials to a public repository. Add it to `.gitignore`.
+
+### Firestore Security Rules
+
+For production, update your Firestore rules in the Firebase console:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/progress/data {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /leaderboard/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+
+### Authorized Domains
+
+For Google sign-in to work on the deployed site, add your domain to Firebase:
+
+**Authentication** → **Settings** → **Authorized domains** → Add `akcameron87.github.io`
 
 ---
 
@@ -200,12 +279,13 @@ npx angular-cli-ghpages --dir=dist/cyberSense-trainer/browser
 
 ## Roadmap
 
-- [ ] Firebase Authentication (user accounts)
-- [ ] Firestore cloud progress sync
-- [ ] Global leaderboard
+- [x] Firebase Authentication (user accounts)
+- [x] Firestore cloud progress sync
+- [x] Global leaderboard
+- [ ] Firestore production security rules
 - [ ] More scenario categories (QR code attacks, deepfake audio)
 - [ ] Admin panel for custom scenario creation
-- [ ] Team/organization training mode
+- [ ] Team/organisation training mode
 
 ---
 
