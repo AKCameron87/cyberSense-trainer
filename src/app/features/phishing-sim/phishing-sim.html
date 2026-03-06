@@ -1,5 +1,4 @@
 <div class="min-h-screen bg-cyber-dark text-white page-enter">
-<div class="min-h-screen bg-cyber-dark text-white">
 
   <!-- Header -->
   <header class="flex items-center justify-between px-6 py-4 border-b border-cyber-border">
@@ -17,7 +16,7 @@
   <div *ngIf="loading" class="flex items-center justify-center min-h-[60vh]">
     <div class="text-center">
       <div class="spinner mb-4"></div>
-      <p class="text-cyber-muted">Loading scenarios...</p>
+      <p class="text-cyber-muted">{{ loadingMessage }}</p>
     </div>
   </div>
 
@@ -60,6 +59,7 @@
         <li>🔍 Read each email or website carefully</li>
         <li>👆 Click on anything that looks suspicious</li>
         <li>💡 You'll get instant feedback on each find</li>
+        <li>❌ Wrong clicks will deduct {{ wrongClickPenalty }} points — be careful!</li>
         <li>➡️ Move on when you're ready</li>
         <li>⭐ Score points for every red flag you identify</li>
       </ul>
@@ -100,6 +100,7 @@
           </span>
         </div>
 
+        <!-- Red flags panel -->
         <div class="card">
           <h4 class="text-xs uppercase tracking-wider text-cyber-muted mb-3">Red Flags Found</h4>
           <div class="space-y-2">
@@ -112,6 +113,17 @@
               <span *ngIf="foundFlagIds.includes(flag.id)" class="text-xs text-cyber-green font-bold">
                 +{{ flag.points }}
               </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Penalties indicator -->
+        <div *ngIf="totalPenalties > 0" class="card border border-cyber-red border-opacity-30">
+          <div class="flex items-center gap-2">
+            <span class="text-cyber-red text-lg">⚠️</span>
+            <div>
+              <p class="text-xs text-cyber-red font-bold">Penalties Incurred</p>
+              <p class="text-xs text-cyber-muted">-{{ totalPenalties }} pts from wrong clicks</p>
             </div>
           </div>
         </div>
@@ -162,7 +174,7 @@
             </div>
           </div>
 
-          <!-- Body -->
+          <!-- Scenario body -->
           <div id="scenario-body"
                class="scenario-body bg-white text-black p-0 min-h-[400px]"
                [innerHTML]="safeBodyHtml">
@@ -170,12 +182,12 @@
         </div>
 
         <p class="text-center text-cyber-muted text-xs mt-3">
-          💡 Click on suspicious elements in the {{ currentScenario.type === 'email' ? 'email' : 'website' }} above to flag them
+          💡 Click suspicious elements to flag them · Wrong clicks cost {{ wrongClickPenalty }} pts
         </p>
       </div>
     </div>
 
-    <!-- Feedback toast -->
+    <!-- ✅ Correct flag feedback toast -->
     <div *ngIf="shownFeedback" class="feedback-toast">
       <div class="flex items-start gap-3">
         <span class="text-2xl">🚩</span>
@@ -187,28 +199,51 @@
       </div>
     </div>
 
-  </div>
-
-  <!-- Session complete -->
-  <div *ngIf="sessionComplete" class="max-w-xl mx-auto px-6 py-16 text-center">
-    <span class="text-6xl mb-6 block">🏁</span>
-    <h2 class="text-4xl font-bold mb-2">Session Complete!</h2>
-    <p class="text-cyber-muted mb-8">Here's how you did in the phishing simulation</p>
-
-    <div class="card mb-6">
-      <div class="text-5xl font-bold text-cyber-accent mb-2">{{ sessionScore }}</div>
-      <div class="text-cyber-muted text-sm">out of {{ totalPossible }} possible points</div>
-      <div class="mt-4 h-3 bg-cyber-border rounded-full overflow-hidden">
-        <div class="h-full bg-cyber-accent rounded-full transition-all duration-1000"
-             [style.width.%]="(sessionScore / totalPossible) * 100">
-        </div>
+    <!-- ❌ Wrong click feedback toast -->
+    <div *ngIf="showWrongFeedback"
+         class="feedback-toast wrong-feedback-toast">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">❌</span>
+        <p class="font-bold text-cyber-red flex-1">{{ wrongClickMessage }}</p>
       </div>
     </div>
 
-    <div class="flex gap-4 justify-center">
-      <button (click)="goHome()" class="btn-secondary">← Home</button>
-      <button (click)="goToResults()" class="btn-primary">View Results →</button>
+  </div>
+
+<!-- Session complete -->
+<div *ngIf="sessionComplete" class="max-w-xl mx-auto px-6 py-16 text-center">
+  <span class="text-6xl mb-6 block">✅</span>
+  <h2 class="text-4xl font-bold mb-2">Session Complete!</h2>
+  <p class="text-cyber-muted mb-8">Here's how you did in the phishing simulation</p>
+
+  <div class="card mb-6">
+    <!-- Base score -->
+    <div class="text-5xl font-bold text-cyber-accent mb-1">{{ sessionScore }}</div>
+    <div class="text-cyber-muted text-sm">points earned (including difficulty bonus)</div>
+
+    <!-- Multiplier breakdown — only show if multiplier > 1 -->
+    <div *ngIf="(selectedDifficulty?.pointMultiplier ?? 1) > 1"
+         class="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-yellow bg-opacity-10 border border-cyber-yellow border-opacity-30">
+      <span class="text-cyber-yellow text-sm font-bold">{{ selectedDifficulty.pointMultiplier }}x multiplier active</span>
+    </div>
+
+    <div *ngIf="totalPenalties > 0" class="text-cyber-red text-xs mt-2">
+      -{{ totalPenalties }} pts from {{ totalPenalties / wrongClickPenalty | number:'1.0-0' }} wrong clicks
+    </div>
+
+    <div class="mt-4 h-3 bg-cyber-border rounded-full overflow-hidden">
+      <div class="h-full bg-cyber-accent rounded-full transition-all duration-1000"
+           [style.width.%]="(sessionScore / totalPossible) * 100">
+      </div>
+    </div>
+    <div class="flex justify-between text-xs text-cyber-muted mt-1">
+      <span>0</span>
+      <span>{{ totalPossible }} possible</span>
     </div>
   </div>
 
+  <div class="flex gap-4 justify-center">
+    <button (click)="goHome()" class="btn-secondary">← Home</button>
+    <button (click)="goToResults()" class="btn-primary">View Results →</button>
+  </div>
 </div>

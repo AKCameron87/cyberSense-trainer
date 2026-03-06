@@ -1,5 +1,4 @@
-<div class="min-h-screen bg-cyber-dark text-white page-enter">
-<div class="min-h-screen bg-cyber-dark text-white overflow-x-hidden">
+<div class="min-h-screen bg-cyber-dark text-white overflow-x-hidden page-enter">
 
   <!-- Animated background grid -->
   <div class="fixed inset-0 pointer-events-none z-0">
@@ -20,7 +19,8 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-6">
+    <div class="flex items-center gap-4">
+
       <!-- Stats row -->
       <div class="hidden md:flex items-center gap-6 text-sm">
         <div class="text-center">
@@ -39,10 +39,32 @@
         </div>
       </div>
 
-      <button (click)="goToDashboard()"
-              class="btn-secondary text-sm px-4 py-2">
+      <!-- Leaderboard -->
+      <button (click)="goToLeaderboard()" class="btn-secondary text-sm px-4 py-2">
+          🏆 Leaderboard
+        </button>
+
+      <!-- Dashboard -->
+      <button (click)="goToDashboard()" class="btn-secondary text-sm px-4 py-2">
         Dashboard
       </button>
+
+      <!-- Auth: signed in -->
+      <ng-container *ngIf="authService.currentUser()">
+        <div class="flex items-center gap-3">
+          <img *ngIf="authService.userPhotoURL"
+               [src]="authService.userPhotoURL"
+               class="w-8 h-8 rounded-full border border-cyber-accent">
+          <span class="text-sm text-white hidden md:block">{{ authService.userDisplayName }}</span>
+          <button (click)="signOut()" class="btn-secondary text-xs px-3 py-1.5">Sign Out</button>
+        </div>
+      </ng-container>
+
+      <!-- Auth: signed out -->
+      <ng-container *ngIf="!authService.currentUser()">
+        <button (click)="goToAuth()" class="btn-primary text-sm px-4 py-2">Sign In</button>
+      </ng-container>
+
     </div>
   </header>
 
@@ -78,7 +100,6 @@
           *ngFor="let diff of difficulties"
           (click)="selectDifficulty(diff)"
           [class]="getDifficultyClass(diff)">
-
           <span class="font-bold tracking-wider">{{ diff.label }}</span>
           <span class="text-xs opacity-70 block mt-0.5">
             {{ diff.timerSeconds ? diff.timerSeconds + 's timer' : 'No timer' }}
@@ -87,60 +108,57 @@
         </button>
       </div>
 
-      <!-- Difficulty description -->
       <p class="text-center text-cyber-muted text-sm mt-4">
         {{ selectedDifficulty.description }}
       </p>
     </div>
 
+    <!-- AI Mode Toggle -->
+    <div class="flex justify-center mb-8">
+      <button
+        (click)="toggleAiMode()"
+        [class]="aiMode
+          ? 'flex items-center gap-3 px-6 py-3 rounded-full border-2 border-cyber-accent bg-cyber-accent bg-opacity-10 text-cyber-accent font-bold transition-all'
+          : 'flex items-center gap-3 px-6 py-3 rounded-full border-2 border-cyber-border text-cyber-muted hover:border-cyber-accent hover:text-cyber-accent font-bold transition-all'">
+        <span class="text-xl">🤖</span>
+        <span>AI Generated Scenarios</span>
+        <span [class]="aiMode ? 'w-10 h-5 rounded-full bg-cyber-accent relative' : 'w-10 h-5 rounded-full bg-cyber-border relative'">
+          <span [class]="aiMode
+            ? 'absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-white transition-all'
+            : 'absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white transition-all'">
+          </span>
+        </span>
+      </button>
+    </div>
+
     <!-- Mode Cards -->
     <div class="grid md:grid-cols-2 gap-6 mb-16">
       <div
-      *ngFor="let mode of modes"
-      class="mode-card card cursor-pointer group relative overflow-hidden"
-      (click)="navigateTo(mode.route)">
+        *ngFor="let mode of modes"
+        class="mode-card card cursor-pointer group relative overflow-hidden"
+        (click)="navigateTo(mode.route)">
 
-
-        <!-- Hover glow effect -->
         <div [class]="'mode-glow mode-glow-' + mode.color"></div>
 
         <div class="relative z-10">
-          <!-- Icon & Title -->
           <div class="flex items-start justify-between mb-4">
             <div>
               <span class="text-4xl mb-3 block">{{ mode.icon }}</span>
-              <p class="text-xs text-cyber-muted uppercase tracking-widest mb-1">
-                {{ mode.subtitle }}
-              </p>
+              <p class="text-xs text-cyber-muted uppercase tracking-widest mb-1">{{ mode.subtitle }}</p>
               <h3 class="text-2xl font-bold">{{ mode.title }}</h3>
             </div>
-            <div [class]="'arrow-badge arrow-badge-' + mode.color">
-              →
-            </div>
+            <div [class]="'arrow-badge arrow-badge-' + mode.color">→</div>
           </div>
 
-          <!-- Description -->
-          <p class="text-cyber-muted text-sm leading-relaxed mb-6">
-            {{ mode.description }}
-          </p>
+          <p class="text-cyber-muted text-sm leading-relaxed mb-6">{{ mode.description }}</p>
 
-          <!-- Tags -->
           <div class="flex flex-wrap gap-2">
-            <span
-              *ngFor="let tag of mode.tags"
-              [class]="'tag tag-' + mode.color">
-              {{ tag }}
-            </span>
+            <span *ngFor="let tag of mode.tags" [class]="'tag tag-' + mode.color">{{ tag }}</span>
           </div>
 
-          <!-- Difficulty badge -->
           <div class="mt-6 pt-4 border-t border-cyber-border flex items-center justify-between">
-            <span [class]="selectedDifficulty.badgeClass">
-              {{ selectedDifficulty.label }}
-            </span>
-            <span class="text-xs text-cyber-muted">
-              {{ selectedDifficulty.pointMultiplier }}x point multiplier
-            </span>
+            <span [class]="selectedDifficulty.badgeClass">{{ selectedDifficulty.label }}</span>
+            <span class="text-xs text-cyber-muted">{{ selectedDifficulty.pointMultiplier }}x point multiplier</span>
           </div>
         </div>
       </div>
@@ -149,11 +167,11 @@
     <!-- Info Strip -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
       <div class="card py-4">
-        <p class="text-2xl font-bold text-cyber-accent">15+</p>
+        <p class="text-2xl font-bold text-cyber-accent">28+</p>
         <p class="text-xs text-cyber-muted mt-1 uppercase tracking-wider">Quiz Scenarios</p>
       </div>
       <div class="card py-4">
-        <p class="text-2xl font-bold text-cyber-green">6</p>
+        <p class="text-2xl font-bold text-cyber-green">11</p>
         <p class="text-xs text-cyber-muted mt-1 uppercase tracking-wider">Phishing Simulations</p>
       </div>
       <div class="card py-4">

@@ -6,6 +6,7 @@ export interface SessionResult {
     correct: boolean;
     pointsEarned: number;
     timeTaken: number | null; // seconds or null if no timer (rookie)
+    category?: string;
 }
 
 export interface CategoryScore {

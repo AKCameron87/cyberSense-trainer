@@ -1,5 +1,4 @@
 <div class="min-h-screen bg-cyber-dark text-white page-enter">
-<div class="min-h-screen bg-cyber-dark text-white">
 
   <!-- Header -->
   <header class="flex items-center justify-between px-6 py-4 border-b border-cyber-border">
@@ -20,7 +19,7 @@
   <div *ngIf="loading" class="flex items-center justify-center min-h-[60vh]">
     <div class="text-center">
       <div class="spinner mb-4"></div>
-      <p class="text-cyber-muted">Loading questions...</p>
+      <p class="text-cyber-muted">{{ loadingMessage }}</p>
     </div>
   </div>
 
@@ -115,18 +114,18 @@
 
     <!-- Answer options -->
     <div class="space-y-3 mb-6">
-      <button
-        *ngFor="let option of currentQuestion?.options"
-        [class]="'option-btn ' + getOptionClass(option.id)"
-        (click)="selectAnswer(option.id)"
-        [disabled]="answerSubmitted">
-        <span class="option-letter">{{ option.id.toUpperCase() }}</span>
-        <span class="flex-1 text-left">{{ option.text }}</span>
-        <span *ngIf="answerSubmitted && option.id === currentQuestion?.correctId"
-              class="text-cyber-green text-lg">✓</span>
+    <button
+      *ngFor="let option of shuffledOptions"
+      [class]="'option-btn ' + getOptionClass(option.id)"
+      (click)="selectAnswer(option.id)"
+      [disabled]="answerSubmitted">
+      <span class="option-letter">{{ option.id.toUpperCase() }}</span>
+      <span class="flex-1 text-left">{{ option.text }}</span>
+      <span *ngIf="answerSubmitted && option.id === correctShuffledId"
+        class="text-cyber-green text-lg">✓</span>
         <span *ngIf="answerSubmitted && option.id === selectedAnswer && !isCorrect"
-              class="text-cyber-red text-lg">✗</span>
-      </button>
+        class="text-cyber-red text-lg">✗</span>
+    </button>
     </div>
 
     <!-- Submit / Next -->
@@ -168,7 +167,7 @@
 
   <!-- Session complete -->
   <div *ngIf="sessionComplete" class="max-w-2xl mx-auto px-6 py-16 text-center">
-    <span class="text-6xl mb-4 block">🏁</span>
+    <span class="text-6xl mb-4 block">✅</span>
     <h2 class="text-4xl font-bold mb-2">Quiz Complete!</h2>
 
     <div [class]="'text-2xl font-bold mb-8 ' + getGrade().color">

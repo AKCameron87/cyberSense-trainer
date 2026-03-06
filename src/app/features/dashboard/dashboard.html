@@ -1,5 +1,4 @@
 <div class="min-h-screen bg-cyber-dark text-white page-enter">
-<div class="min-h-screen bg-cyber-dark text-white">
 
   <!-- Background -->
   <div class="fixed inset-0 pointer-events-none z-0">
@@ -14,9 +13,7 @@
       </div>
       <h1 class="text-lg font-bold tracking-widest">CYBERSENSE</h1>
     </div>
-    <div class="flex items-center gap-3">
-      <button (click)="goHome()" class="btn-secondary text-sm px-4 py-2">← Home</button>
-    </div>
+    <button (click)="goHome()" class="btn-secondary text-sm px-4 py-2">← Home</button>
   </header>
 
   <div class="relative z-10 max-w-5xl mx-auto px-6 py-10">
@@ -68,9 +65,11 @@
         <!-- Category breakdown -->
         <div class="card">
           <h3 class="font-bold mb-4">Performance by Category</h3>
-          <div *ngIf="progress?.categoryScores?.length === 0" class="text-cyber-muted text-sm">
-            No category data yet. Complete more sessions!
+
+          <div *ngIf="!progress?.categoryScores?.length" class="text-cyber-muted text-sm py-4 text-center">
+            No category data yet — complete a quiz session to see breakdown!
           </div>
+
           <div class="space-y-3">
             <div *ngFor="let cat of progress?.categoryScores" class="space-y-1">
               <div class="flex justify-between text-sm">
@@ -78,10 +77,9 @@
                 <span class="text-cyber-muted">{{ cat.correct }}/{{ cat.total }} · {{ cat.percentage }}%</span>
               </div>
               <div class="h-2 bg-cyber-border rounded-full overflow-hidden">
-                <div
-                  class="h-full rounded-full transition-all duration-700"
-                  [class]="getCategoryColor(cat)"
-                  [style.width.%]="cat.percentage">
+                <div class="h-full rounded-full transition-all duration-700"
+                     [class]="getCategoryColor(cat)"
+                     [style.width.%]="cat.percentage">
                 </div>
               </div>
             </div>
@@ -91,18 +89,19 @@
         <!-- Recent sessions -->
         <div class="card">
           <h3 class="font-bold mb-4">Recent Sessions</h3>
-          <div *ngIf="recentSessions.length === 0" class="text-cyber-muted text-sm">
+
+          <div *ngIf="!recentSessions.length" class="text-cyber-muted text-sm py-4 text-center">
             No sessions recorded yet.
           </div>
+
           <div class="space-y-2">
-            <div *ngFor="let session of recentSessions"
-                 class="session-row">
+            <div *ngFor="let session of recentSessions" class="session-row">
               <span class="text-xl">{{ getSessionIcon(session.mode) }}</span>
               <div class="flex-1 min-w-0">
                 <p class="text-sm font-medium truncate">{{ getSessionLabel(session.mode) }}</p>
                 <p class="text-xs text-cyber-muted">{{ formatDate(session.startedAt) }}</p>
               </div>
-              <div class="text-right">
+              <div class="text-right flex-shrink-0">
                 <p class="text-sm font-bold text-cyber-accent">{{ session.totalScore }} pts</p>
                 <p [class]="'text-xs ' + getSessionResultColor(session)">
                   {{ getSessionResult(session) }}
@@ -138,12 +137,11 @@
         <h3 class="font-bold mb-5">
           Badges
           <span class="text-cyber-muted text-sm font-normal ml-2">
-            {{ earnedBadges.length }} / {{ (progress?.badges?.length ?? 0) }} earned
+            {{ earnedBadges.length }} / {{ progress?.badges?.length ?? 0 }} earned
           </span>
         </h3>
 
         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <!-- Earned -->
           <div *ngFor="let badge of earnedBadges" class="badge-earned">
             <span class="text-3xl">{{ badge.icon }}</span>
             <div>
@@ -152,7 +150,6 @@
               <p class="text-xs text-cyber-green mt-1">Earned {{ formatDate(badge.earnedAt) }}</p>
             </div>
           </div>
-          <!-- Locked -->
           <div *ngFor="let badge of lockedBadges" class="badge-locked">
             <span class="text-3xl opacity-30">{{ badge.icon }}</span>
             <div>

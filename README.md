@@ -35,12 +35,15 @@ Users can create an account to sync their progress across devices, compete on th
 ## Features
 
 - 🎣 **Phishing Simulator** — Click on red flags inside realistic phishing emails and fake websites
+- ❌ **Wrong Click Penalties** — Incorrect clicks deduct points scaled to difficulty, adding real consequence
 - 🧠 **Social Engineering Quiz** — Multiple choice scenarios covering 5 attack types
+- 🔀 **Shuffled Answers** — Quiz answer options are randomised each session to prevent pattern recognition
 - 🏆 **Global Leaderboard** — Compete with other trainers worldwide
-- 👤 **User Accounts** — Sign in with Google or email/password
+- 👤 **User Accounts** — Sign in with Google or email/password with enforced password policy
 - ☁️ **Cloud Sync** — Progress saved to Firestore and synced across devices
 - 🥇 **Badge System** — Earn badges for performance and milestones
 - 📊 **Dashboard** — Track total points, accuracy, sessions, and category breakdown
+- 📈 **Score Breakdown** — Results show base points and difficulty bonus separately
 - 📄 **PDF Export** — Download a full training report after each session
 - 🤖 **AI Generated Scenarios** — Infinitely unique content powered by Claude AI
 - 🎨 **Page Transitions** — Smooth animations between routes
@@ -50,7 +53,12 @@ Users can create an account to sync their progress across devices, compete on th
 ## Game Modes
 
 ### 🎣 Phishing Simulator
-Realistic phishing emails and fake websites are shown one at a time. Click on anything suspicious to flag it as a red flag. Each scenario contains multiple hidden red flags worth varying points. You can skip scenarios or move on once all flags are found.
+Realistic phishing emails and fake websites are shown one at a time. Click on anything suspicious to flag it as a red flag. Each scenario contains multiple hidden red flags worth varying points.
+
+**Scoring:**
+- Each red flag found earns points multiplied by your difficulty modifier
+- Wrong clicks on non-suspicious elements deduct points — penalties scale with difficulty
+- Rookie: -15 pts | Analyst: -25 pts | Expert: -40 pts per wrong click
 
 **What to look for:**
 - Suspicious sender email domains
@@ -60,7 +68,7 @@ Realistic phishing emails and fake websites are shown one at a time. Click on an
 - Requests for sensitive information
 
 ### 🧠 Social Engineering Quiz
-Multiple choice questions present realistic attack scenarios. Choose the best response and receive instant feedback with an explanation and a practical security tip. Covers 5 attack types across all difficulty levels.
+Multiple choice questions present realistic attack scenarios. Answer options are shuffled every session so you can't rely on position memory. Choose the best response and receive instant feedback with an explanation and a practical security tip.
 
 **Attack types covered:**
 | Type | Description |
@@ -75,11 +83,22 @@ Multiple choice questions present realistic attack scenarios. Choose the best re
 
 ## Difficulty Levels
 
-| Level | Timer | Point Multiplier | Description |
-|-------|-------|-----------------|-------------|
-| 🟢 Rookie | None | 1x | Obvious red flags, ideal for beginners |
-| 🟡 Analyst | 30s | 1.5x | Moderately subtle attacks, time pressure added |
-| 🔴 Expert | 15s | 2x | Highly convincing scenarios, maximum challenge |
+| Level | Timer | Point Multiplier | Wrong Click Penalty | Description |
+|-------|-------|-----------------|-------------------|-------------|
+| 🟢 Rookie | None | 1x | -15 pts | Obvious red flags, ideal for beginners |
+| 🟡 Analyst | 30s | 1.5x | -25 pts | Moderately subtle attacks, time pressure added |
+| 🔴 Expert | 15s | 2x | -40 pts | Highly convincing scenarios, maximum challenge |
+
+---
+
+## Score Breakdown
+
+The results page displays your score transparently:
+
+- **Base points** — raw points earned before any multiplier
+- **Difficulty bonus** — extra points from the difficulty multiplier
+- **Total points** — final score added to your leaderboard ranking
+- **Accuracy percentage** — calculated from base score vs total possible, never exceeds 100%
 
 ---
 
@@ -99,9 +118,17 @@ CyberSense Trainer supports user accounts via Firebase Authentication.
 - Google (one-click)
 - Email and password
 
+**Password policy (email/password accounts):**
+- Minimum 16 characters
+- Must include uppercase and lowercase letters
+- Must include at least one number
+- Must include at least one special character
+
+A live strength meter and requirements checklist guide users through the policy during registration. The register button is disabled until all requirements are met.
+
 **What an account unlocks:**
 - Cloud sync — progress saved to Firestore and available on any device
-- Global leaderboard — your scores are submitted after each session
+- Global leaderboard — scores submitted after each session
 - Persistent rank tracking across sessions
 
 Signing in is optional. The app is fully playable without an account using local browser storage.
@@ -167,11 +194,11 @@ src/
 │   │       └── firestore.service.ts     # Firestore read/write operations
 │   └── features/
 │       ├── home/             # Landing page with difficulty & mode selection
-│       ├── auth/             # Login & registration page
-│       ├── phishing-sim/     # Phishing simulation game mode
-│       ├── social-eng-quiz/  # Social engineering quiz game mode
-│       ├── results/          # Post-session results & PDF export
-│       ├── dashboard/        # Progress tracking dashboard
+│       ├── auth/             # Login & registration with password strength meter
+│       ├── phishing-sim/     # Phishing simulation with wrong click penalties
+│       ├── social-eng-quiz/  # Social engineering quiz with shuffled answers
+│       ├── results/          # Results with base/bonus score breakdown
+│       ├── dashboard/        # Progress tracking and badge collection
 │       └── leaderboard/      # Global rankings
 ├── assets/
 │   └── data/
@@ -188,7 +215,7 @@ To run this project locally with Firebase features enabled:
 
 1. Go to [console.firebase.google.com](https://console.firebase.google.com) and create a project
 2. Enable **Authentication** → **Google** and **Email/Password** providers
-3. Enable **Firestore Database** in test mode
+3. Enable **Firestore Database** — choose your region (recommend `us-east1`)
 4. Register a web app and copy the `firebaseConfig`
 5. Create `src/app/core/firebase.config.ts`:
 
@@ -207,7 +234,7 @@ export const firebaseConfig = {
 
 ### Firestore Security Rules
 
-For production, update your Firestore rules in the Firebase console:
+In the Firebase console go to **Firestore** → **Rules** and paste:
 
 ```
 rules_version = '2';
@@ -224,9 +251,15 @@ service cloud.firestore {
 }
 ```
 
+### Password Policy
+
+In Firebase console go to **Authentication** → **Settings** → **Password policy** and configure:
+- Minimum length: 16
+- Require uppercase, lowercase, numeric, and special characters
+
 ### Authorized Domains
 
-For Google sign-in to work on the deployed site, add your domain to Firebase:
+For Google sign-in to work on the deployed site:
 
 **Authentication** → **Settings** → **Authorized domains** → Add `akcameron87.github.io`
 
@@ -282,10 +315,13 @@ npx angular-cli-ghpages --dir=dist/cyberSense-trainer/browser
 - [x] Firebase Authentication (user accounts)
 - [x] Firestore cloud progress sync
 - [x] Global leaderboard
-- [ ] Firestore production security rules
+- [x] Wrong click penalties in phishing simulator
+- [x] Shuffled quiz answers
+- [x] Password policy with strength meter
+- [x] Base/bonus score breakdown on results
 - [ ] More scenario categories (QR code attacks, deepfake audio)
 - [ ] Admin panel for custom scenario creation
-- [ ] Team/organisation training mode
+- [ ] Team/organization training mode
 
 ---
 

@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { PhishingSimComponent } from './features/phishing-sim/phishing-sim';
 
 export const routes: Routes = [
   {
@@ -7,17 +6,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/home/home').then(m => m.HomeComponent)
   },
-{
-  path: 'phishing-sim',
-  loadComponent: () =>
-    import('./features/phishing-sim/phishing-sim').then(m => {
-      console.log('Module loaded, component:', m.PhishingSimComponent);
-      return m.PhishingSimComponent;
-    }).catch(err => {
-      console.error('ROUTE LOAD ERROR:', err);
-      throw err;
-    })
-},
+  {
+    path: 'phishing-sim',
+    loadComponent: () =>
+      import('./features/phishing-sim/phishing-sim').then(m => m.PhishingSimComponent)
+  },
   {
     path: 'social-eng-quiz',
     loadComponent: () =>
@@ -32,6 +25,16 @@ export const routes: Routes = [
     path: 'dashboard',
     loadComponent: () =>
       import('./features/dashboard/dashboard').then(m => m.DashboardComponent)
+  },
+  {
+    path: 'auth',
+    loadComponent: () =>
+      import('./features/auth/auth.component').then(m => m.AuthComponent)
+  },
+  {
+    path: 'leaderboard',
+    loadComponent: () =>
+      import('./features/leaderboard/leaderboard.component').then(m => m.LeaderboardComponent)
   },
   {
     path: '**',

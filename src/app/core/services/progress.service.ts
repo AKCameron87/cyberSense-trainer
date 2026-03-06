@@ -6,12 +6,13 @@ import {
   CategoryScore,
   Badge,
   DEFAULT_USER_PROGRESS,
+  DEFAULT_BADGES,
   Difficulty
 } from '../models/index';
 
 const STORAGE_KEYS = {
-  USER_PROGRESS: 'cyberSense_userProgress',
-  SESSIONS:      'cyberSense_sessions',
+  USER_PROGRESS:   'cyberSense_userProgress',
+  SESSIONS:        'cyberSense_sessions',
   CURRENT_SESSION: 'cyberSense_currentSession'
 } as const;
 
@@ -22,7 +23,29 @@ export class ProgressService {
 
   getUserProgress(): UserProgress {
     const stored = localStorage.getItem(STORAGE_KEYS.USER_PROGRESS);
-    return stored ? JSON.parse(stored) : { ...DEFAULT_USER_PROGRESS };
+    if (!stored) return this.buildDefaultProgress();
+
+    const progress = JSON.parse(stored) as UserProgress;
+
+    // Ensure badge list is always complete — merges any missing badges
+    progress.badges = this.mergeBadges(progress.badges ?? []);
+    return progress;
+  }
+
+  private buildDefaultProgress(): UserProgress {
+    return {
+      ...DEFAULT_USER_PROGRESS,
+      badges:         DEFAULT_BADGES.map(b => ({ ...b })),
+      categoryScores: []
+    };
+  }
+
+  // Ensures all badges exist, preserving any already earned
+  private mergeBadges(existing: Badge[]): Badge[] {
+    return DEFAULT_BADGES.map(template => {
+      const found = existing.find(b => b.id === template.id);
+      return found ?? { ...template };
+    });
   }
 
   private saveUserProgress(progress: UserProgress): void {
@@ -62,8 +85,20 @@ export class ProgressService {
     if (!session) return;
 
     session.results.push(result);
-    session.totalScore += result.pointsEarned;
+
+    // Recalculate total from all results to avoid drift
+    session.totalScore = session.results.reduce(
+      (sum, r) => sum + (r.pointsEarned ?? 0), 0
+    );
+
     localStorage.setItem(STORAGE_KEYS.CURRENT_SESSION, JSON.stringify(session));
+
+    // Update category scores in real time if category is provided
+    if (result.category) {
+      const progress = this.getUserProgress();
+      this.updateCategoryScore(progress, result.category, result.correct);
+      this.saveUserProgress(progress);
+    }
   }
 
   completeSession(): GameSession | null {
@@ -71,8 +106,13 @@ export class ProgressService {
     if (!session) return null;
 
     session.completedAt = new Date().toISOString();
-    const correctCount  = session.results.filter(r => r.correct).length;
-    session.passed      = (correctCount / session.results.length) >= 0.7;
+
+    // Safe pass check — handle 0 results (phishing sim counts flags, not questions)
+    const correct = session.results.filter(r => r.correct).length;
+    const total   = session.results.length;
+    session.passed = total > 0
+      ? (correct / total) >= 0.7
+      : session.totalScore > 0; // phishing sim: passed if any points scored
 
     // Persist to session history
     const sessions = this.getAllSessions();
@@ -99,7 +139,7 @@ export class ProgressService {
     const correct = session.results.filter(r => r.correct).length;
 
     progress.totalSessions++;
-    progress.totalPoints   += session.totalScore;
+    progress.totalPoints   += Math.max(0, session.totalScore); // never add negative
     progress.totalCorrect  += correct;
     progress.totalAnswered += session.results.length;
     progress.lastPlayed     = new Date().toISOString();
@@ -116,8 +156,10 @@ export class ProgressService {
   updateCategoryScore(
     progress: UserProgress,
     category: string,
-    correct: boolean
+    correct:  boolean
   ): UserProgress {
+    if (!category) return progress;
+
     const existing = progress.categoryScores.find(c => c.category === category);
 
     if (existing) {
@@ -139,8 +181,9 @@ export class ProgressService {
   // ─── Badge Evaluation ────────────────────────────────────────────
 
   private evaluateBadges(progress: UserProgress, session: GameSession): Badge[] {
-    const badges  = [...progress.badges];
-    const now     = new Date().toISOString();
+    const badges = this.mergeBadges(progress.badges);
+    const now    = new Date().toISOString();
+
     const correct = session.results.filter(r => r.correct).length;
     const total   = session.results.length;
 
@@ -152,10 +195,10 @@ export class ProgressService {
     // First session
     if (progress.totalSessions === 1) award('first-session');
 
-    // Perfect score
-    if (correct === total && total > 0) award('perfect-score');
+    // Perfect score — all results correct and no wrong-click penalties
+    if (total > 0 && correct === total) award('perfect-score');
 
-    // Expert mode completion
+    // Expert mode pass
     if (session.difficulty === Difficulty.Expert && session.passed) {
       award('expert-mode');
     }
@@ -168,11 +211,11 @@ export class ProgressService {
     }
 
     // Phishing expert — 5 phishing sessions passed
-    const phishingSessions = this.getAllSessions()
-      .filter(s => s.mode === 'phishing-sim' && s.passed);
-    if (phishingSessions.length >= 5) award('phishing-expert');
+    const phishingPassed = this.getAllSessions()
+      .filter(s => s.mode === 'phishing-sim' && s.passed).length;
+    if (phishingPassed >= 5) award('phishing-expert');
 
-    // Human Firewall — completed all attack type categories
+    // Human Firewall — all 5 attack categories covered
     const coveredTypes = new Set(progress.categoryScores.map(c => c.category));
     const allTypes     = ['phishing', 'vishing', 'smishing', 'baiting', 'pretexting'];
     if (allTypes.every(t => coveredTypes.has(t))) award('social-engineer');
@@ -184,7 +227,7 @@ export class ProgressService {
 
   getAccuracyPercentage(): number {
     const progress = this.getUserProgress();
-    if (progress.totalAnswered === 0) return 0;
+    if (!progress.totalAnswered) return 0;
     return Math.round((progress.totalCorrect / progress.totalAnswered) * 100);
   }
 
@@ -197,6 +240,6 @@ export class ProgressService {
   }
 
   getEarnedBadges(): Badge[] {
-    return this.getUserProgress().badges.filter(b => b.earnedAt !== null);
+    return this.getUserProgress().badges.filter(b => !!b.earnedAt);
   }
 }

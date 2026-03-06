@@ -1,0 +1,73 @@
+<div class="min-h-screen bg-cyber-dark text-white page-enter">
+
+  <header class="flex items-center justify-between px-6 py-4 border-b border-cyber-border">
+    <button (click)="goHome()" class="flex items-center gap-2 text-cyber-muted hover:text-white transition-colors">
+      ← Back
+    </button>
+    <h1 class="text-lg font-bold tracking-widest text-cyber-accent">LEADERBOARD</h1>
+    <div class="w-20"></div>
+  </header>
+
+  <div class="max-w-2xl mx-auto px-6 py-10">
+
+    <div class="text-center mb-10">
+      <span class="text-5xl mb-4 block">🏆</span>
+      <h2 class="text-3xl font-bold mb-2">Global Rankings</h2>
+      <p class="text-cyber-muted">Top CyberSense Trainers worldwide</p>
+      <p *ngIf="currentUserRank > 0" class="text-cyber-accent text-sm mt-2">
+        Your rank: #{{ currentUserRank }}
+      </p>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="text-center py-20">
+      <div class="spinner mb-4 mx-auto"></div>
+      <p class="text-cyber-muted">Loading rankings...</p>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!loading && entries.length === 0" class="text-center py-20">
+      <p class="text-4xl mb-4">🌐</p>
+      <p class="text-white font-bold mb-2">No entries yet</p>
+      <p class="text-cyber-muted text-sm">Complete a session while signed in to appear here!</p>
+    </div>
+
+    <!-- Entries -->
+    <div *ngIf="!loading && entries.length > 0" class="space-y-3">
+      <div
+        *ngFor="let entry of entries; let i = index"
+        [class]="'flex items-center gap-4 p-4 rounded-lg border transition-all ' + getRankClass(i + 1) + (isCurrentUser(entry) ? ' ring-1 ring-cyber-accent' : '')">
+
+        <!-- Rank -->
+        <div class="w-10 text-center">
+          <span class="text-xl font-bold">{{ getRankIcon(i + 1) }}</span>
+        </div>
+
+        <!-- Avatar -->
+        <div class="w-10 h-10 rounded-full bg-cyber-card border border-cyber-border overflow-hidden flex items-center justify-center flex-shrink-0">
+          <img *ngIf="entry.photoURL" [src]="entry.photoURL" class="w-full h-full object-cover">
+          <span *ngIf="!entry.photoURL" class="text-cyber-accent font-bold text-lg">
+            {{ entry.displayName?.charAt(0)?.toUpperCase() ?? '?' }}
+          </span>
+        </div>
+
+        <!-- Name & stats -->
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <p class="font-bold text-white truncate">{{ entry.displayName ?? 'Anonymous' }}</p>
+            <span *ngIf="isCurrentUser(entry)" class="text-xs text-cyber-accent">(you)</span>
+          </div>
+          <p class="text-xs text-cyber-muted">{{ entry.sessions }} sessions · {{ entry.accuracy }}% accuracy</p>
+        </div>
+
+        <!-- Points -->
+        <div class="text-right flex-shrink-0">
+          <p class="font-bold text-cyber-accent text-lg">{{ entry.totalPoints | number }}</p>
+          <p class="text-xs text-cyber-muted">points</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

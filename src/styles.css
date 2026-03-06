@@ -79,3 +79,19 @@
 .page-enter {
   animation: fadeSlideIn 0.35s ease forwards;
 }
+
+/* Wrong click feedback toast */
+.wrong-feedback-toast {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 77, 109, 0.15);
+  border: 1px solid #ff4d6d;
+  border-radius: 12px;
+  padding: 14px 20px;
+  min-width: 280px;
+  max-width: 480px;
+  z-index: 100;
+  animation: slideUp 0.2s ease forwards;
+}

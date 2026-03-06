@@ -1,5 +1,4 @@
 <div class="min-h-screen bg-cyber-dark text-white page-enter">
-<div class="min-h-screen bg-cyber-dark text-white">
 
   <!-- Animated background -->
   <div class="fixed inset-0 pointer-events-none z-0">
@@ -23,20 +22,36 @@
 
     <!-- Score hero -->
     <div class="card text-center mb-6">
-      <div class="text-7xl font-bold text-cyber-accent mb-2">{{ percentage }}%</div>
-      <p class="text-cyber-muted mb-6">{{ score }} out of {{ total }} possible points</p>
 
-      <!-- Score bar -->
+      <!-- Main percentage -->
+      <div class="text-7xl font-bold text-cyber-accent mb-1">{{ percentage }}%</div>
+
+      <!-- Base score breakdown -->
+      <p class="text-cyber-muted mb-1">
+        {{ baseScore }} / {{ total }} base points
+      </p>
+
+      <!-- Multiplier bonus — only show if there's a bonus -->
+      <div *ngIf="bonusPoints > 0"
+           class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-yellow bg-opacity-10 border border-cyber-yellow border-opacity-30 mb-4">
+        <span class="text-cyber-yellow text-sm font-bold">+{{ bonusPoints }} difficulty bonus</span>
+        <span class="text-cyber-muted text-xs">= {{ score }} total pts</span>
+      </div>
+
+      <div *ngIf="bonusPoints === 0" class="mb-4">
+        <span class="text-cyber-muted text-sm">{{ score }} points earned</span>
+      </div>
+
+      <!-- Score bar based on base score vs total -->
       <div class="h-4 bg-cyber-border rounded-full overflow-hidden mb-2">
-        <div
-          class="h-full rounded-full transition-all duration-1000"
-          [class]="grade.bg"
-          [style.width.%]="percentage">
+        <div class="h-full rounded-full transition-all duration-1000"
+             [class]="grade.bg"
+             [style.width.%]="percentage">
         </div>
       </div>
       <div class="flex justify-between text-xs text-cyber-muted">
         <span>0</span>
-        <span>{{ total }} pts</span>
+        <span>{{ total }} base pts</span>
       </div>
     </div>
 
@@ -66,10 +81,9 @@
             <span class="text-xs text-cyber-muted">{{ cat.correct }}/{{ cat.total }} · {{ cat.percentage }}%</span>
           </div>
           <div class="h-2 bg-cyber-border rounded-full overflow-hidden">
-            <div
-              class="h-full rounded-full transition-all duration-700"
-              [class]="getCategoryColor(cat)"
-              [style.width.%]="getCategoryBarWidth(cat)">
+            <div class="h-full rounded-full transition-all duration-700"
+                 [class]="getCategoryColor(cat)"
+                 [style.width.%]="getCategoryBarWidth(cat)">
             </div>
           </div>
         </div>
@@ -106,18 +120,10 @@
 
     <!-- Actions -->
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <button (click)="goHome()" class="btn-secondary">
-        ← Home
-      </button>
-      <button (click)="playAgain()" class="btn-primary">
-        Play Again →
-      </button>
-      <button (click)="goToDashboard()" class="btn-secondary">
-        Dashboard →
-      </button>
-      <button (click)="exportPDF()" class="btn-secondary">
-      📄 Export PDF
-      </button>
+      <button (click)="goHome()" class="btn-secondary">← Home</button>
+      <button (click)="playAgain()" class="btn-primary">Play Again →</button>
+      <button (click)="goToDashboard()" class="btn-secondary">Dashboard →</button>
+      <button (click)="exportPDF()" class="btn-secondary">📄 Export PDF</button>
     </div>
 
   </div>
