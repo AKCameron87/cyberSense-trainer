@@ -5,159 +5,203 @@ import { PhishingScenario, QuizQuestion, Difficulty, AttackType } from '../model
 export class AiScenarioService {
 
   private readonly API_URL: string | null = window.location.hostname === 'localhost'
-  ? 'http://localhost:3001/v1/messages'
-  : null;
-  private readonly MODEL   = 'claude-sonnet-4-20250514';
+    ? 'http://localhost:3001/v1/messages'
+    : null;
 
+  private readonly MODEL = 'claude-sonnet-4-20250514';
+
+  // ─── Phishing Scenario Generation ────────────────────────────────
 
   async generatePhishingScenario(
     difficulty: Difficulty,
     usedTitles: string[] = []
   ): Promise<PhishingScenario | null> {
+    if (!this.API_URL) return null;
+
     const avoidList = usedTitles.length
-      ? `Do NOT generate any of these scenarios: ${usedTitles.join(', ')}.`
+      ? `\nDo NOT repeat any of these already-used scenarios: ${usedTitles.join('; ')}.\nYour scenario MUST be on a completely different topic, brand, and attack vector.`
       : '';
 
-    const prompt = `Generate a realistic phishing simulation scenario for a cybersecurity training app.
+    // Pick a random seed to force variety
+    const seeds = [
+      'a fake bank security alert', 'a fake package delivery notice',
+      'a fake IT helpdesk password reset', 'a fake invoice from a vendor',
+      'a fake HR benefits update', 'a fake cloud storage sharing request',
+      'a fake tax refund notification', 'a fake subscription renewal',
+      'a fake executive request for urgent wire transfer',
+      'a fake government compliance notice',
+      'a fake software license expiry warning',
+      'a fake prize or lottery win notification'
+    ];
+    const seed = seeds[Math.floor(Math.random() * seeds.length)];
+
+    const prompt = `You are generating a phishing simulation scenario for a cybersecurity training application.
+
 Difficulty: ${difficulty}
+Topic seed (use this as inspiration): ${seed}
 ${avoidList}
 
-Return ONLY a valid JSON object with this exact structure:
+Return ONLY a valid JSON object with EXACTLY this structure — no markdown, no explanation, no code fences:
+
 {
   "id": "ai-p-001",
   "type": "email",
   "difficulty": "${difficulty}",
-  "title": "Short descriptive title",
+  "title": "Short descriptive title (different from the seed, be creative)",
   "description": "One sentence instruction for the trainee",
-  "category": "Attack category name",
-  "subject": "Email subject line",
+  "category": "Phishing",
+  "subject": "Realistic email subject line",
   "senderEmail": "fake@suspicious-domain.com",
   "totalPoints": 400,
   "redFlags": [
     {
       "id": "rf1",
       "elementId": "rf-sender",
-      "description": "Why this is suspicious",
+      "description": "Explain exactly why the sender address is suspicious",
       "points": 100
     },
     {
       "id": "rf2",
       "elementId": "rf-urgency",
-      "description": "Why this is suspicious",
+      "description": "Explain the urgency or pressure tactic used",
       "points": 100
     },
     {
       "id": "rf3",
       "elementId": "rf-link",
-      "description": "Why this is suspicious",
+      "description": "Explain why the link or button is suspicious",
       "points": 100
     },
     {
       "id": "rf4",
       "elementId": "rf-footer",
-      "description": "Why this is suspicious",
+      "description": "Explain the suspicious footer or branding element",
       "points": 100
     }
   ],
-  "bodyHtml": "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'><!-- realistic email HTML here. IMPORTANT: each red flag elementId must appear as an id on a clickable HTML element inside this HTML --></div>"
+  "bodyHtml": "FULL HTML EMAIL BODY HERE"
 }
 
-Rules:
-- difficulty rookie = obvious red flags, analyst = subtle, expert = very convincing
-- The bodyHtml must be realistic looking HTML email content
-- Every elementId in redFlags (rf-sender, rf-urgency, rf-link, rf-footer) MUST appear as an id attribute on a element in bodyHtml
-- Make the email look convincing but with detectable flaws appropriate to the difficulty
-- totalPoints = sum of all red flag points
-- Return ONLY the JSON, no markdown, no explanation`;
+bodyHtml requirements:
+- Must be realistic, well-formatted HTML that looks like a genuine company email
+- Must contain elements with EXACTLY these id attributes: rf-sender (in the header area), rf-urgency (urgency text/button), rf-link (a clickable link or button), rf-footer (footer text or logo)
+- Difficulty rookie = obvious red flags (misspellings, obvious fake domains)
+- Difficulty analyst = subtle red flags (slightly off branding, minor domain issues)
+- Difficulty expert = very convincing (nearly identical to real emails, very subtle flaws)
+- Use inline styles to make it look professional
+- The HTML should be a complete email body div, not a full HTML document`;
 
     try {
-     const response = await fetch(this.API_URL!, {
+      const response = await fetch(this.API_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
-        model:      this.MODEL,
-        max_tokens: 2000,
-        messages:   [{ role: 'user', content: prompt }]
-        })
-     });
-
-      const data = await response.json();
-      const text = data.content?.[0]?.text ?? '';
-      const clean = text.replace(/```json|```/g, '').trim();
-      const scenario = JSON.parse(clean) as PhishingScenario;
-      scenario.id = `ai-p-${Date.now()}`;
-      return scenario;
-    } catch (err) {
-      console.error('AI scenario generation failed:', err);
-      return null;
-    }
-  }
-
-  async generateQuizQuestion(
-    difficulty: Difficulty,
-    attackType: AttackType,
-    usedIds: string[] = []
-  ): Promise<QuizQuestion | null> {
-    const prompt = `Generate a realistic social engineering quiz question for a cybersecurity training app.
-Difficulty: ${difficulty}
-Attack type: ${attackType}
-
-Return ONLY a valid JSON object with this exact structure:
-{
-  "id": "ai-q-001",
-  "attackType": "${attackType}",
-  "difficulty": "${difficulty}",
-  "scenario": "A realistic 2-4 sentence scenario description",
-  "options": [
-    { "id": "a", "text": "First answer option" },
-    { "id": "b", "text": "Second answer option" },
-    { "id": "c", "text": "Correct answer option" },
-    { "id": "d", "text": "Fourth answer option" }
-  ],
-  "correctId": "c",
-  "explanation": "2-3 sentence explanation of why this is the correct answer",
-  "points": 150,
-  "tip": "One practical security tip related to this scenario"
-}
-
-Rules:
-- difficulty rookie = obvious attack, analyst = moderately subtle, expert = very convincing
-- The scenario must be realistic and plausible
-- One option must be clearly correct, others plausible but wrong
-- The correct answer should NOT always be option c — randomize which option id is correct
-- explanation should teach the user something valuable
-- points: rookie=100, analyst=150, expert=200
-- Return ONLY the JSON, no markdown, no explanation`;
-
-    try {
-      const response = await fetch(this.API_URL!, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
           model:      this.MODEL,
-          max_tokens: 1000,
+          max_tokens: 3000,
           messages:   [{ role: 'user', content: prompt }]
         })
       });
 
-      const data = await response.json();
-      const text = data.content?.[0]?.text ?? '';
+      const data  = await response.json();
+      const text  = data.content?.[0]?.text ?? '';
       const clean = text.replace(/```json|```/g, '').trim();
-      const question = JSON.parse(clean) as QuizQuestion;
-      question.id = `ai-q-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      return question;
+      const scenario = JSON.parse(clean) as PhishingScenario;
+      scenario.id    = `ai-p-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      return scenario;
     } catch (err) {
-      console.error('AI question generation failed:', err);
+      console.error('AI phishing generation failed:', err);
       return null;
     }
   }
+
+  // ─── Quiz Question Generation ─────────────────────────────────────
+
+  async generateQuizQuestion(
+    difficulty: Difficulty,
+    attackType: AttackType,
+    usedScenarios: string[] = []
+  ): Promise<QuizQuestion | null> {
+    if (!this.API_URL) return null;
+
+    const avoidList = usedScenarios.length
+      ? `\nDo NOT repeat scenarios similar to: ${usedScenarios.join('; ')}.\nYour scenario must be on a completely different topic.`
+      : '';
+
+    // Randomly pick which option is correct to break the model's c-bias
+    const optionLabels = ['a', 'b', 'c', 'd'];
+    const correctLabel = optionLabels[Math.floor(Math.random() * 4)];
+    const wrongLabels  = optionLabels.filter(l => l !== correctLabel);
+
+    const prompt = `You are generating a social engineering quiz question for a cybersecurity training application.
+
+Difficulty: ${difficulty}
+Attack type: ${attackType}
+${avoidList}
+
+The CORRECT answer MUST be option "${correctLabel}". This is mandatory — do not make any other option the correct answer.
+
+Return ONLY a valid JSON object with EXACTLY this structure — no markdown, no explanation, no code fences:
+
+{
+  "id": "ai-q-001",
+  "attackType": "${attackType}",
+  "difficulty": "${difficulty}",
+  "scenario": "A realistic 2-4 sentence scenario description. Be specific and creative — describe a real-world situation involving ${attackType}.",
+  "options": [
+    { "id": "a", "text": "${correctLabel === 'a' ? 'THE CORRECT RESPONSE - best security action to take' : `Plausible but incorrect option - a wrong response to the ${attackType} attack`}" },
+    { "id": "b", "text": "${correctLabel === 'b' ? 'THE CORRECT RESPONSE - best security action to take' : `Plausible but incorrect option - a wrong response to the ${attackType} attack`}" },
+    { "id": "c", "text": "${correctLabel === 'c' ? 'THE CORRECT RESPONSE - best security action to take' : `Plausible but incorrect option - a wrong response to the ${attackType} attack`}" },
+    { "id": "d", "text": "${correctLabel === 'd' ? 'THE CORRECT RESPONSE - best security action to take' : `Plausible but incorrect option - a wrong response to the ${attackType} attack`}" }
+  ],
+  "correctId": "${correctLabel}",
+  "explanation": "2-3 sentences explaining why option ${correctLabel} is correct and what makes the other options wrong or risky",
+  "points": ${difficulty === 'rookie' ? 100 : difficulty === 'analyst' ? 150 : 200},
+  "tip": "One concrete, actionable security tip related to defending against ${attackType} attacks"
+}
+
+Important rules:
+- The scenario must be a specific, realistic situation — not generic
+- Wrong options must be plausible enough to be tempting, not obviously wrong
+- The correct answer (option ${correctLabel}) must be the best security response
+- Explanation must reference why option ${correctLabel} specifically is correct
+- Difficulty rookie = obvious attack with clear correct answer
+- Difficulty analyst = moderately subtle, requires security knowledge  
+- Difficulty expert = very convincing scenario, correct answer requires careful reasoning`;
+
+    try {
+      const response = await fetch(this.API_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          model:      this.MODEL,
+          max_tokens: 1200,
+          messages:   [{ role: 'user', content: prompt }]
+        })
+      });
+
+      const data  = await response.json();
+      const text  = data.content?.[0]?.text ?? '';
+      const clean = text.replace(/```json|```/g, '').trim();
+      const question = JSON.parse(clean) as QuizQuestion;
+
+      // Override correctId with what we mandated — safety net in case model drifts
+      question.correctId = correctLabel;
+      question.id        = `ai-q-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      return question;
+    } catch (err) {
+      console.error('AI quiz generation failed:', err);
+      return null;
+    }
+  }
+
+  // ─── Batch Generation ─────────────────────────────────────────────
 
   async generatePhishingBatch(
     difficulty: Difficulty,
     count: number
   ): Promise<PhishingScenario[]> {
-    const results: PhishingScenario[] = [];
-    const usedTitles: string[] = [];
+    const results:    PhishingScenario[] = [];
+    const usedTitles: string[]           = [];
 
     for (let i = 0; i < count; i++) {
       const scenario = await this.generatePhishingScenario(difficulty, usedTitles);
@@ -174,22 +218,27 @@ Rules:
     count: number
   ): Promise<QuizQuestion[]> {
     const attackTypes: AttackType[] = [
-        AttackType.Phishing,
-        AttackType.Vishing,
-        AttackType.Smishing,
-        AttackType.Baiting,
-        AttackType.Pretexting
-        ];
+      AttackType.Phishing,
+      AttackType.Vishing,
+      AttackType.Smishing,
+      AttackType.Baiting,
+      AttackType.Pretexting
+    ];
 
-    const results: QuizQuestion[] = [];
-    const usedIds: string[] = [];
+    // Shuffle attack types so order varies each session
+    const shuffled = [...attackTypes].sort(() => Math.random() - 0.5);
+
+    const results:       QuizQuestion[] = [];
+    const usedScenarios: string[]       = [];
 
     for (let i = 0; i < count; i++) {
-      const attackType = attackTypes[i % attackTypes.length];
-      const question = await this.generateQuizQuestion(difficulty, attackType, usedIds);
+      // Cycle through shuffled attack types
+      const attackType = shuffled[i % shuffled.length];
+      const question   = await this.generateQuizQuestion(difficulty, attackType, usedScenarios);
       if (question) {
         results.push(question);
-        usedIds.push(question.id);
+        // Track scenario text to avoid repetition
+        usedScenarios.push(question.scenario.slice(0, 80));
       }
     }
     return results;
