@@ -49,6 +49,13 @@
         Dashboard
       </button>
 
+      <!-- Admin panel — only shown to admins -->
+        <button *ngIf="isAdmin"
+        (click)="goToAdmin()"
+        class="btn-secondary text-sm px-4 py-2 border-cyber-red text-cyber-red hover:bg-cyber-red hover:text-white">
+          ⚙️ Admin
+        </button>
+
       <!-- Auth: signed in -->
       <ng-container *ngIf="authService.currentUser()">
         <div class="flex items-center gap-3">

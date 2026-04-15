@@ -1,0 +1,348 @@
+<div class="min-h-screen bg-cyber-dark text-white page-enter">
+
+  <!-- Header -->
+  <header class="flex items-center justify-between px-8 py-5 border-b border-cyber-border">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-cyber-red flex items-center justify-center text-white font-bold text-lg">
+        A
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-widest text-white">ADMIN PANEL</h1>
+        <p class="text-xs text-cyber-muted">CyberSense Trainer</p>
+      </div>
+    </div>
+    <button (click)="goHome()" class="btn-secondary text-sm px-4 py-2">← Home</button>
+  </header>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="flex items-center justify-center min-h-[60vh]">
+    <div class="text-center">
+      <div class="spinner mb-4 mx-auto"></div>
+      <p class="text-cyber-muted">Loading admin data...</p>
+    </div>
+  </div>
+
+  <div *ngIf="!loading" class="max-w-5xl mx-auto px-6 py-10">
+
+    <!-- Success / Error messages -->
+    <div *ngIf="success"
+         class="mb-6 p-4 rounded-lg bg-cyber-green bg-opacity-10 border border-cyber-green text-cyber-green text-sm">
+      ✅ {{ success }}
+    </div>
+    <div *ngIf="error"
+         class="mb-6 p-4 rounded-lg bg-cyber-red bg-opacity-10 border border-cyber-red text-cyber-red text-sm">
+      ❌ {{ error }}
+    </div>
+
+    <!-- Tabs -->
+    <div *ngIf="mode() === 'list'" class="flex gap-2 mb-8">
+      <button (click)="setTab('phishing')"
+              [class]="activeTab() === 'phishing'
+                ? 'px-6 py-2 rounded-lg bg-cyber-accent text-cyber-dark font-bold text-sm'
+                : 'px-6 py-2 rounded-lg border border-cyber-border text-cyber-muted hover:text-white text-sm transition-colors'">
+        🎣 Phishing Scenarios ({{ scenarios.length }})
+      </button>
+      <button (click)="setTab('quiz')"
+              [class]="activeTab() === 'quiz'
+                ? 'px-6 py-2 rounded-lg bg-cyber-accent text-cyber-dark font-bold text-sm'
+                : 'px-6 py-2 rounded-lg border border-cyber-border text-cyber-muted hover:text-white text-sm transition-colors'">
+        🧠 Quiz Questions ({{ questions.length }})
+      </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- PHISHING LIST                                               -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div *ngIf="mode() === 'list' && activeTab() === 'phishing'">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold">Custom Phishing Scenarios</h2>
+        <button (click)="newScenario()" class="btn-primary text-sm px-5 py-2">+ New Scenario</button>
+      </div>
+
+      <div *ngIf="!scenarios.length" class="card text-center py-16">
+        <p class="text-4xl mb-4">🎣</p>
+        <p class="text-white font-bold mb-2">No custom scenarios yet</p>
+        <p class="text-cyber-muted text-sm mb-6">Create your first custom phishing email scenario.</p>
+        <button (click)="newScenario()" class="btn-primary">Create Scenario</button>
+      </div>
+
+      <div class="space-y-3">
+        <div *ngFor="let scenario of scenarios"
+             class="card flex items-center gap-4">
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-white truncate">{{ scenario.title }}</p>
+            <p class="text-xs text-cyber-muted mt-1">
+              {{ scenario.difficulty }} · {{ scenario.redFlags.length }} red flags · {{ scenario.totalPoints }} pts
+            </p>
+          </div>
+          <div class="flex gap-2 flex-shrink-0">
+            <button (click)="editScenario(scenario)"
+                    class="text-xs px-3 py-1.5 rounded border border-cyber-accent text-cyber-accent hover:bg-cyber-accent hover:text-cyber-dark transition-colors">
+              Edit
+            </button>
+            <button (click)="deleteScenario(scenario.id)"
+                    class="text-xs px-3 py-1.5 rounded border border-cyber-red text-cyber-red hover:bg-cyber-red hover:text-white transition-colors">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- QUIZ LIST                                                    -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div *ngIf="mode() === 'list' && activeTab() === 'quiz'">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold">Custom Quiz Questions</h2>
+        <button (click)="newQuestion()" class="btn-primary text-sm px-5 py-2">+ New Question</button>
+      </div>
+
+      <div *ngIf="!questions.length" class="card text-center py-16">
+        <p class="text-4xl mb-4">🧠</p>
+        <p class="text-white font-bold mb-2">No custom questions yet</p>
+        <p class="text-cyber-muted text-sm mb-6">Create your first custom quiz question.</p>
+        <button (click)="newQuestion()" class="btn-primary">Create Question</button>
+      </div>
+
+      <div class="space-y-3">
+        <div *ngFor="let question of questions"
+             class="card flex items-center gap-4">
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-white truncate">{{ question.scenario | slice:0:80 }}...</p>
+            <p class="text-xs text-cyber-muted mt-1">
+              {{ question.attackType }} · {{ question.difficulty }} · {{ question.points }} pts
+            </p>
+          </div>
+          <div class="flex gap-2 flex-shrink-0">
+            <button (click)="editQuestion(question)"
+                    class="text-xs px-3 py-1.5 rounded border border-cyber-accent text-cyber-accent hover:bg-cyber-accent hover:text-cyber-dark transition-colors">
+              Edit
+            </button>
+            <button (click)="deleteQuestion(question.id)"
+                    class="text-xs px-3 py-1.5 rounded border border-cyber-red text-cyber-red hover:bg-cyber-red hover:text-white transition-colors">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- PHISHING EDIT FORM                                          -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div *ngIf="mode() === 'edit' && activeTab() === 'phishing'">
+      <div class="flex items-center gap-4 mb-8">
+        <button (click)="cancelEdit()" class="text-cyber-muted hover:text-white transition-colors">← Back</button>
+        <h2 class="text-2xl font-bold">
+          {{ editingScenario.id ? 'Edit Scenario' : 'New Scenario' }}
+        </h2>
+      </div>
+
+      <div class="space-y-6">
+
+        <!-- Basic info -->
+        <div class="card space-y-4">
+          <h3 class="font-bold text-cyber-accent">Basic Info</h3>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="admin-label">Title</label>
+              <input [(ngModel)]="editingScenario.title" type="text"
+                     placeholder="e.g. Fake FedEx Delivery Notice"
+                     class="admin-input">
+            </div>
+            <div>
+              <label class="admin-label">Difficulty</label>
+              <select [(ngModel)]="editingScenario.difficulty" class="admin-input">
+                <option *ngFor="let d of difficulties" [value]="d">{{ d }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="admin-label">Description (shown to trainee)</label>
+            <input [(ngModel)]="editingScenario.description" type="text"
+                   placeholder="e.g. Identify the red flags in this email."
+                   class="admin-input">
+          </div>
+        </div>
+
+        <!-- Email details -->
+        <div class="card space-y-4">
+          <h3 class="font-bold text-cyber-accent">Email Details</h3>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="admin-label">Subject Line</label>
+              <input [(ngModel)]="editingScenario.subject" type="text"
+                     placeholder="e.g. URGENT: Package Delivery Failed"
+                     class="admin-input">
+            </div>
+            <div>
+              <label class="admin-label">Sender Email</label>
+              <input [(ngModel)]="editingScenario.senderEmail" type="text"
+                     placeholder="e.g. noreply@fedx-delivery.net"
+                     class="admin-input">
+            </div>
+          </div>
+
+          <div>
+            <label class="admin-label">Email Body HTML</label>
+            <p class="text-xs text-cyber-muted mb-2">
+              Write the full HTML email body. Elements with red flag IDs (rf-sender, rf-urgency, rf-link, rf-footer) must appear as id attributes.
+            </p>
+            <textarea [(ngModel)]="editingScenario.bodyHtml"
+                      rows="12"
+                      placeholder="<div style='font-family: Arial...'> ... </div>"
+                      class="admin-input font-mono text-xs">
+            </textarea>
+          </div>
+        </div>
+
+        <!-- Red flags -->
+        <div class="card space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-cyber-accent">Red Flags</h3>
+            <button (click)="addRedFlag()" class="text-xs px-3 py-1.5 rounded border border-cyber-green text-cyber-green hover:bg-cyber-green hover:text-cyber-dark transition-colors">
+              + Add Flag
+            </button>
+          </div>
+
+          <div *ngFor="let flag of editingScenario.redFlags; let i = index"
+               class="p-4 rounded-lg bg-cyber-darker border border-cyber-border space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-cyber-muted uppercase tracking-wider">Flag {{ i + 1 }}</span>
+              <button *ngIf="editingScenario.redFlags.length > 1"
+                      (click)="removeRedFlag(i)"
+                      class="text-cyber-red text-xs hover:underline">Remove</button>
+            </div>
+            <div class="grid md:grid-cols-3 gap-3">
+              <div>
+                <label class="admin-label">Element ID</label>
+                <input [(ngModel)]="flag.elementId" type="text"
+                       placeholder="e.g. rf-sender"
+                       class="admin-input text-sm">
+              </div>
+              <div class="md:col-span-2">
+                <label class="admin-label">Description (feedback shown to trainee)</label>
+                <input [(ngModel)]="flag.description" type="text"
+                       placeholder="e.g. The sender domain is misspelled"
+                       class="admin-input text-sm">
+              </div>
+            </div>
+            <div>
+              <label class="admin-label">Points</label>
+              <input [(ngModel)]="flag.points" type="number" min="0"
+                     class="admin-input text-sm w-32">
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-4">
+          <button (click)="cancelEdit()" class="btn-secondary">Cancel</button>
+          <button (click)="saveScenario()" [disabled]="saving" class="btn-primary">
+            {{ saving ? 'Saving...' : 'Save Scenario' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- QUIZ EDIT FORM                                              -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div *ngIf="mode() === 'edit' && activeTab() === 'quiz'">
+      <div class="flex items-center gap-4 mb-8">
+        <button (click)="cancelEdit()" class="text-cyber-muted hover:text-white transition-colors">← Back</button>
+        <h2 class="text-2xl font-bold">
+          {{ editingQuestion.id ? 'Edit Question' : 'New Question' }}
+        </h2>
+      </div>
+
+      <div class="space-y-6">
+
+        <!-- Basic info -->
+        <div class="card space-y-4">
+          <h3 class="font-bold text-cyber-accent">Basic Info</h3>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div>
+              <label class="admin-label">Attack Type</label>
+              <select [(ngModel)]="editingQuestion.attackType" class="admin-input">
+                <option *ngFor="let t of attackTypes" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="admin-label">Difficulty</label>
+              <select [(ngModel)]="editingQuestion.difficulty" class="admin-input">
+                <option *ngFor="let d of difficulties" [value]="d">{{ d }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="admin-label">Points</label>
+              <input [(ngModel)]="editingQuestion.points" type="number" min="0"
+                     class="admin-input">
+            </div>
+          </div>
+
+          <div>
+            <label class="admin-label">Scenario</label>
+            <textarea [(ngModel)]="editingQuestion.scenario"
+                      rows="4"
+                      placeholder="Describe a realistic attack scenario in 2-4 sentences..."
+                      class="admin-input">
+            </textarea>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="card space-y-4">
+          <h3 class="font-bold text-cyber-accent">Answer Options</h3>
+          <p class="text-xs text-cyber-muted">Select which option is correct using the radio buttons.</p>
+
+          <div *ngFor="let option of editingQuestion.options"
+               class="flex items-center gap-3">
+            <input type="radio"
+                   [name]="'correctId'"
+                   [value]="option.id"
+                   [(ngModel)]="editingQuestion.correctId"
+                   class="accent-cyber-green w-4 h-4 flex-shrink-0">
+            <span class="text-cyber-accent font-bold w-5 flex-shrink-0">{{ option.id.toUpperCase() }}</span>
+            <input [(ngModel)]="option.text"
+                   type="text"
+                   [placeholder]="'Option ' + option.id.toUpperCase()"
+                   class="admin-input flex-1">
+          </div>
+        </div>
+
+        <!-- Explanation & Tip -->
+        <div class="card space-y-4">
+          <h3 class="font-bold text-cyber-accent">Feedback</h3>
+          <div>
+            <label class="admin-label">Explanation (shown after answer)</label>
+            <textarea [(ngModel)]="editingQuestion.explanation"
+                      rows="3"
+                      placeholder="Explain why the correct answer is right and what makes the others wrong..."
+                      class="admin-input">
+            </textarea>
+          </div>
+          <div>
+            <label class="admin-label">Security Tip</label>
+            <input [(ngModel)]="editingQuestion.tip" type="text"
+                   placeholder="One practical security tip related to this scenario..."
+                   class="admin-input">
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-4">
+          <button (click)="cancelEdit()" class="btn-secondary">Cancel</button>
+          <button (click)="saveQuestion()" [disabled]="saving" class="btn-primary">
+            {{ saving ? 'Saving...' : 'Save Question' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

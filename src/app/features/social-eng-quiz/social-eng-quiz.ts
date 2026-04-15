@@ -308,6 +308,10 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
     return DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)?.badgeClass ?? 'badge-rookie';
   }
 
+  get currentTip(): string {
+    return this.currentQuestion?.tip ?? '';
+  }
+
   goToResults(): void {
   const multiplier = DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)?.pointMultiplier ?? 1;
   const baseScore  = multiplier > 1 ? Math.round(this.sessionScore / multiplier) : this.sessionScore;

@@ -1,4 +1,5 @@
-import { Routes } from '@angular/router';
+import { Routes }     from '@angular/router';
+import { adminGuard } from './core/guards/admin.guards';
 
 export const routes: Routes = [
   {
@@ -35,6 +36,12 @@ export const routes: Routes = [
     path: 'leaderboard',
     loadComponent: () =>
       import('./features/leaderboard/leaderboard.component').then(m => m.LeaderboardComponent)
+  },
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('../app/features/admin/admin.component').then(m => m.AdminComponent),
+    canActivate: [adminGuard]
   },
   {
     path: '**',

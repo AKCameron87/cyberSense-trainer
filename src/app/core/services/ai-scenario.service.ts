@@ -4,9 +4,9 @@ import { PhishingScenario, QuizQuestion, Difficulty, AttackType } from '../model
 @Injectable({ providedIn: 'root' })
 export class AiScenarioService {
 
-  private readonly API_URL: string | null = window.location.hostname === 'localhost'
+  private readonly API_URL: string = window.location.hostname === 'localhost'
     ? 'http://localhost:3001/v1/messages'
-    : null;
+    : 'https://us-central1-cybersense-trainer.cloudfunctions.net/anthropicProxy';
 
   private readonly MODEL = 'claude-sonnet-4-20250514';
 

@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule }      from '@angular/common';
 import { Router }            from '@angular/router';
 import { DIFFICULTY_CONFIGS, DifficultyConfig } from '../../core/models/index';
 import { ProgressService }   from '../../core/services/progress.service';
 import { AuthService }       from '../../core/services/auth.service';
+import { AdminService }      from '../../core/services/admin.service';
 
 @Component({
   selector:    'app-home',
@@ -20,6 +21,7 @@ export class HomeComponent implements OnInit {
   totalSessions       = 0;
   accuracy            = 0;
   aiMode              = false;
+  isAdmin             = false;
 
   readonly modes = [
     {
@@ -47,21 +49,38 @@ export class HomeComponent implements OnInit {
   constructor(
     private router:          Router,
     private progressService: ProgressService,
+    private adminService:    AdminService,
+    private cdr: ChangeDetectorRef,
     public  authService:     AuthService
   ) {}
 
-  ngOnInit(): void {
-    const progress     = this.progressService.getUserProgress();
-    this.totalPoints   = progress.totalPoints;
-    this.totalSessions = progress.totalSessions;
-    this.accuracy      = this.progressService.getAccuracyPercentage();
+async ngOnInit(): Promise<void> {
+  const progress     = this.progressService.getUserProgress();
+  this.totalPoints   = progress.totalPoints;
+  this.totalSessions = progress.totalSessions;
+  this.accuracy      = this.progressService.getAccuracyPercentage();
 
-    if (progress.preferredDifficulty) {
-      this.selectedDifficulty = DIFFICULTY_CONFIGS.find(
-        d => d.level === progress.preferredDifficulty
-      ) ?? DIFFICULTY_CONFIGS[0];
-    }
+  if (progress.preferredDifficulty) {
+    this.selectedDifficulty = DIFFICULTY_CONFIGS.find(
+      d => d.level === progress.preferredDifficulty
+    ) ?? DIFFICULTY_CONFIGS[0];
   }
+
+  // Wait for auth state to resolve before checking admin
+  const user = await new Promise<any>(resolve => {
+    const unsub = this.authService.auth.onAuthStateChanged((u: any) => {
+          unsub();
+            resolve(u);
+    });
+  });
+
+  if (user) {
+    this.isAdmin = await this.adminService.isAdmin(user.uid);
+    this.cdr.detectChanges();
+  }
+
+  
+}
 
   selectDifficulty(config: DifficultyConfig): void {
     this.selectedDifficulty = config;
@@ -93,6 +112,10 @@ export class HomeComponent implements OnInit {
 
   goToLeaderboard(): void {
     this.router.navigate(['/leaderboard']);
+  }
+
+  goToAdmin(): void {
+    this.router.navigate(['/admin']);
   }
 
   goToAuth(): void {
