@@ -36,20 +36,19 @@ export class AdminService {
   }
 
   async saveCustomScenario(scenario: PhishingScenario): Promise<void> {
-    const id  = scenario.id?.startsWith('custom-')
-      ? scenario.id
-      : `custom-${Date.now()}`;
-    const ref = doc(this.firestore, `custom-scenarios/${id}`);
+    const isNew = !scenario.id?.startsWith('custom-');
+    const id    = isNew ? `custom-${crypto.randomUUID()}` : scenario.id;
+    const ref   = doc(this.firestore, `custom-scenarios/${id}`);
     await setDoc(ref, {
       ...scenario,
       id,
-      createdAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
+      ...(isNew && { createdAt: serverTimestamp() })
     });
   }
 
   async deleteCustomScenario(id: string): Promise<void> {
-    const ref = doc(this.firestore, `custom-scenarios/${id}`);
-    await deleteDoc(ref);
+    await deleteDoc(doc(this.firestore, `custom-scenarios/${id}`));
   }
 
   // ─── Custom Quiz Questions ────────────────────────────────────────
@@ -66,19 +65,18 @@ export class AdminService {
   }
 
   async saveCustomQuestion(question: QuizQuestion): Promise<void> {
-    const id  = question.id?.startsWith('custom-')
-      ? question.id
-      : `custom-q-${Date.now()}`;
-    const ref = doc(this.firestore, `custom-questions/${id}`);
+    const isNew = !question.id?.startsWith('custom-');
+    const id    = isNew ? `custom-q-${crypto.randomUUID()}` : question.id;
+    const ref   = doc(this.firestore, `custom-questions/${id}`);
     await setDoc(ref, {
       ...question,
       id,
-      createdAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
+      ...(isNew && { createdAt: serverTimestamp() })
     });
   }
 
   async deleteCustomQuestion(id: string): Promise<void> {
-    const ref = doc(this.firestore, `custom-questions/${id}`);
-    await deleteDoc(ref);
+    await deleteDoc(doc(this.firestore, `custom-questions/${id}`));
   }
 }

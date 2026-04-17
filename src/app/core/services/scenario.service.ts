@@ -15,6 +15,10 @@ export class ScenarioService {
   private customQuiz:     QuizQuestion[]     = [];
   private customLoaded    = false;
 
+  // Cached merged arrays — rebuilt once after custom load
+  private _allPhishing: PhishingScenario[] = [...this.staticPhishing];
+  private _allQuiz:     QuizQuestion[]     = [...this.staticQuiz];
+
   constructor(private adminService: AdminService) {}
 
   // ─── Load custom scenarios from Firestore ────────────────────────
@@ -25,57 +29,42 @@ export class ScenarioService {
       this.customPhishing = await this.adminService.getCustomScenarios();
       this.customQuiz     = await this.adminService.getCustomQuestions();
       this.customLoaded   = true;
+
+      // Rebuild merged arrays once after load
+      this._allPhishing = [...this.staticPhishing, ...this.customPhishing];
+      this._allQuiz     = [...this.staticQuiz,     ...this.customQuiz];
     } catch (err) {
       console.warn('Could not load custom scenarios from Firestore:', err);
     }
-  }
-
-  // ─── Combined getters ─────────────────────────────────────────────
-
-  private get allPhishing(): PhishingScenario[] {
-    return [...this.staticPhishing, ...this.customPhishing];
-  }
-
-  private get allQuiz(): QuizQuestion[] {
-    return [...this.staticQuiz, ...this.customQuiz];
   }
 
   // ─── Phishing ─────────────────────────────────────────────────────
 
   getPhishingScenarios(difficulty?: Difficulty): PhishingScenario[] {
     return difficulty
-      ? this.allPhishing.filter(s => s.difficulty === difficulty)
-      : this.allPhishing;
-  }
-
-  getPhishingById(id: string): PhishingScenario | undefined {
-    return this.allPhishing.find(s => s.id === id);
+      ? this._allPhishing.filter(s => s.difficulty === difficulty)
+      : this._allPhishing;
   }
 
   getRandomPhishingScenarios(count: number, difficulty?: Difficulty): PhishingScenario[] {
-    const pool = this.getPhishingScenarios(difficulty);
-    return this.shuffleAndTake(pool, count);
+    return this.shuffleAndTake(this.getPhishingScenarios(difficulty), count);
   }
 
   // ─── Quiz ─────────────────────────────────────────────────────────
 
   getQuizQuestions(difficulty?: Difficulty, attackType?: AttackType): QuizQuestion[] {
-    let questions = this.allQuiz;
-    if (difficulty)  questions = questions.filter(q => q.difficulty  === difficulty);
-    if (attackType)  questions = questions.filter(q => q.attackType  === attackType);
+    let questions = this._allQuiz;
+    if (difficulty)  questions = questions.filter(q => q.difficulty === difficulty);
+    if (attackType)  questions = questions.filter(q => q.attackType === attackType);
     return questions;
   }
 
-  getQuizById(id: string): QuizQuestion | undefined {
-    return this.allQuiz.find(q => q.id === id);
-  }
-
   getRandomQuizQuestions(
-    count:       number,
-    difficulty?: Difficulty,
+    count:        number,
+    difficulty?:  Difficulty,
     attackTypes?: AttackType[]
   ): QuizQuestion[] {
-    let pool = this.allQuiz;
+    let pool = this._allQuiz;
     if (difficulty)          pool = pool.filter(q => q.difficulty === difficulty);
     if (attackTypes?.length) pool = pool.filter(q => attackTypes.includes(q.attackType));
     return this.shuffleAndTake(pool, count);
@@ -85,9 +74,5 @@ export class ScenarioService {
 
   private shuffleAndTake<T>(arr: T[], count: number): T[] {
     return [...arr].sort(() => Math.random() - 0.5).slice(0, count);
-  }
-
-  isLoaded(): boolean {
-    return true;
   }
 }

@@ -50,37 +50,28 @@ export class HomeComponent implements OnInit {
     private router:          Router,
     private progressService: ProgressService,
     private adminService:    AdminService,
-    private cdr: ChangeDetectorRef,
+    private cdr:             ChangeDetectorRef,
     public  authService:     AuthService
   ) {}
 
-async ngOnInit(): Promise<void> {
-  const progress     = this.progressService.getUserProgress();
-  this.totalPoints   = progress.totalPoints;
-  this.totalSessions = progress.totalSessions;
-  this.accuracy      = this.progressService.getAccuracyPercentage();
+  async ngOnInit(): Promise<void> {
+    const progress     = this.progressService.getUserProgress();
+    this.totalPoints   = progress.totalPoints;
+    this.totalSessions = progress.totalSessions;
+    this.accuracy      = this.progressService.getAccuracyPercentage();
 
-  if (progress.preferredDifficulty) {
-    this.selectedDifficulty = DIFFICULTY_CONFIGS.find(
-      d => d.level === progress.preferredDifficulty
-    ) ?? DIFFICULTY_CONFIGS[0];
+    if (progress.preferredDifficulty) {
+      this.selectedDifficulty = DIFFICULTY_CONFIGS.find(
+        d => d.level === progress.preferredDifficulty
+      ) ?? DIFFICULTY_CONFIGS[0];
+    }
+
+    const user = this.authService.currentUser();
+    if (user) {
+      this.isAdmin = await this.adminService.isAdmin(user.uid);
+      this.cdr.detectChanges();
+    }
   }
-
-  // Wait for auth state to resolve before checking admin
-  const user = await new Promise<any>(resolve => {
-    const unsub = this.authService.auth.onAuthStateChanged((u: any) => {
-          unsub();
-            resolve(u);
-    });
-  });
-
-  if (user) {
-    this.isAdmin = await this.adminService.isAdmin(user.uid);
-    this.cdr.detectChanges();
-  }
-
-  
-}
 
   selectDifficulty(config: DifficultyConfig): void {
     this.selectedDifficulty = config;
