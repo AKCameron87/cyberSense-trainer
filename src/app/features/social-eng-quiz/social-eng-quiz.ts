@@ -72,6 +72,7 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    await this.scenarioService.loadCustomScenarios(); //Loads custom scenarios into memory so they can be used as fallback if AI generation fails or is disabled  
     const diff   = this.route.snapshot.queryParamMap.get('difficulty') as Difficulty;
     const aiMode = this.route.snapshot.queryParamMap.get('aiMode') === 'true';
     this.difficulty = diff ?? Difficulty.Rookie;
