@@ -1,20 +1,17 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule }  from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScenarioService }   from '../../core/services/scenario.service';
 import { ProgressService }   from '../../core/services/progress.service';
 import { AiScenarioService } from '../../core/services/ai-scenario.service';
-
 import {
-  QuizQuestion,
-  Difficulty,
-  DIFFICULTY_CONFIGS
+  QuizQuestion, Difficulty, DIFFICULTY_CONFIGS, DifficultyConfig
 } from '../../core/models/index';
 
 interface ShuffledOption {
   id:       string;
   text:     string;
-  original: string; // original id before shuffle
+  original: string;
 }
 
 @Component({
@@ -26,33 +23,34 @@ interface ShuffledOption {
 })
 export class SocialEngQuizComponent implements OnInit, OnDestroy {
 
-  questions:       QuizQuestion[] = [];
-  currentQuestion: QuizQuestion | null = null;
-  shuffledOptions: ShuffledOption[] = [];
-  correctShuffledId: string = '';  // the shuffled id of the correct answer
-  currentIndex     = 0;
+  questions:         QuizQuestion[]   = [];
+  currentQuestion:   QuizQuestion | null = null;
+  shuffledOptions:   ShuffledOption[] = [];
+  correctShuffledId  = '';
+  currentIndex       = 0;
 
-  difficulty:      Difficulty = Difficulty.Rookie;
-  sessionStarted   = false;
-  sessionComplete  = false;
+  difficulty:        Difficulty = Difficulty.Rookie;
+  sessionStarted     = false;
+  sessionComplete    = false;
 
-  selectedAnswer:  string | null = null;
-  answerSubmitted  = false;
-  isCorrect:       boolean | null = null;
+  selectedAnswer:    string | null = null;
+  answerSubmitted    = false;
+  isCorrect:         boolean | null = null;
 
-  sessionScore     = 0;
-  totalPossible    = 0;
-  correctCount     = 0;
-  streak           = 0;
-  bestStreak       = 0;
+  sessionScore       = 0;
+  totalPossible      = 0;
+  correctCount       = 0;
+  streak             = 0;
+  bestStreak         = 0;
 
-  timeLeft:        number | null = null;
-  timerInterval:   any = null;
-  timerExpired     = false;
+  timeLeft:          number | null = null;
+  timerExpired       = false;
+  loading            = true;
+  loadingMessage     = 'Loading questions...';
 
-  loading          = true;
-  error            = false;
-  loadingMessage   = 'Loading questions...';
+  // Cached difficulty config — set once in ngOnInit
+  private difficultyConfig!: DifficultyConfig;
+  private timerInterval:     ReturnType<typeof setInterval> | null = null;
 
   readonly attackTypeLabels: Record<string, string> = {
     phishing:   '🎣 Phishing',
@@ -72,25 +70,24 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.scenarioService.loadCustomScenarios(); //Loads custom scenarios into memory so they can be used as fallback if AI generation fails or is disabled  
+    await this.scenarioService.loadCustomScenarios();
+
     const diff   = this.route.snapshot.queryParamMap.get('difficulty') as Difficulty;
     const aiMode = this.route.snapshot.queryParamMap.get('aiMode') === 'true';
-    this.difficulty = diff ?? Difficulty.Rookie;
+    this.difficulty       = diff ?? Difficulty.Rookie;
+    this.difficultyConfig = DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)
+      ?? DIFFICULTY_CONFIGS[0];
 
     if (aiMode) {
       this.loadingMessage = '🤖 AI is generating your questions...';
       this.cdr.detectChanges();
-
       const aiQuestions = await this.aiScenarioService.generateQuizBatch(this.difficulty, 5);
-      this.questions = aiQuestions.length
-        ? aiQuestions
-        : this.getFallbackQuestions();
+      this.questions = aiQuestions.length ? aiQuestions : this.getFallbackQuestions();
     } else {
       this.questions = this.getFallbackQuestions();
     }
 
-    // Shuffle question order to prevent patterns
-    this.questions   = this.shuffleArray(this.questions);
+    this.questions     = this.shuffleArray(this.questions);
     this.totalPossible = this.questions.reduce((sum, q) => sum + q.points, 0);
     this.loading       = false;
     this.cdr.detectChanges();
@@ -102,12 +99,9 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
 
   private getFallbackQuestions(): QuizQuestion[] {
     const questions = this.scenarioService.getRandomQuizQuestions(10, this.difficulty);
-    return questions.length
-      ? questions
-      : this.scenarioService.getRandomQuizQuestions(10);
+    return questions.length ? questions : this.scenarioService.getRandomQuizQuestions(10);
   }
 
-  // Fisher-Yates shuffle
   private shuffleArray<T>(arr: T[]): T[] {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -117,24 +111,19 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
     return a;
   }
 
-  // Shuffle answer options and remap correct answer id
   private buildShuffledOptions(question: QuizQuestion): void {
-    const options = question.options.map(o => ({ ...o, original: o.id }));
-    const shuffled = this.shuffleArray(options);
+    const labels   = ['a', 'b', 'c', 'd'];
+    const shuffled = this.shuffleArray(question.options.map(o => ({ ...o, original: o.id })));
 
-    // Reassign display ids (a, b, c, d) after shuffle
-    const labels = ['a', 'b', 'c', 'd'];
     this.shuffledOptions = shuffled.map((opt, i) => ({
       id:       labels[i],
       text:     opt.text,
       original: opt.original
     }));
 
-    // Find which new label maps to the correct original id
-    const correctMapped = this.shuffledOptions.find(
+    this.correctShuffledId = this.shuffledOptions.find(
       o => o.original === question.correctId
-    );
-    this.correctShuffledId = correctMapped?.id ?? question.correctId;
+    )?.id ?? question.correctId;
   }
 
   startSession(): void {
@@ -152,14 +141,11 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
     this.isCorrect       = null;
     this.timerExpired    = false;
 
-    // Shuffle options for this question
     this.buildShuffledOptions(this.currentQuestion);
-
     this.cdr.detectChanges();
 
-    const config = DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty);
-    if (config?.timerSeconds) {
-      this.startTimer(config.timerSeconds);
+    if (this.difficultyConfig.timerSeconds) {
+      this.startTimer(this.difficultyConfig.timerSeconds);
     }
   }
 
@@ -186,7 +172,7 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
       questionId:   this.currentQuestion!.id,
       correct:      false,
       pointsEarned: 0,
-      timeTaken:    DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)?.timerSeconds ?? null,
+      timeTaken:    this.difficultyConfig.timerSeconds ?? null,
       category:     this.currentQuestion?.attackType
     });
 
@@ -212,40 +198,30 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
 
     this.clearTimer();
     this.answerSubmitted = true;
+    this.isCorrect       = this.selectedAnswer === this.correctShuffledId;
 
-    // Compare against shuffled correct id
-    this.isCorrect = this.selectedAnswer === this.correctShuffledId;
-
-    const config     = DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty);
-    const multiplier = config?.pointMultiplier ?? 1;
-    const timeTaken  = config?.timerSeconds
-      ? config.timerSeconds - (this.timeLeft ?? 0)
+    const timeTaken = this.difficultyConfig.timerSeconds
+      ? this.difficultyConfig.timerSeconds - (this.timeLeft ?? 0)
       : null;
 
+    let pointsEarned = 0;
     if (this.isCorrect) {
       this.streak++;
       this.bestStreak   = Math.max(this.streak, this.bestStreak);
       this.correctCount++;
-      const earned      = Math.round(this.currentQuestion.points * multiplier);
-      this.sessionScore += earned;
-
-      this.progressService.addResult({
-        questionId:   this.currentQuestion.id,
-        correct:      true,
-        pointsEarned: earned,
-        timeTaken,
-        category:     this.currentQuestion.attackType  // ← category now passed
-      });
+      pointsEarned      = Math.round(this.currentQuestion.points * this.difficultyConfig.pointMultiplier);
+      this.sessionScore += pointsEarned;
     } else {
       this.streak = 0;
-      this.progressService.addResult({
-        questionId:   this.currentQuestion.id,
-        correct:      false,
-        pointsEarned: 0,
-        timeTaken,
-        category:     this.currentQuestion.attackType  // ← category now passed
-      });
     }
+
+    this.progressService.addResult({
+      questionId:   this.currentQuestion.id,
+      correct:      this.isCorrect,
+      pointsEarned,
+      timeTaken,
+      category:     this.currentQuestion.attackType
+    });
 
     this.cdr.detectChanges();
   }
@@ -265,15 +241,12 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  // Uses shuffled option ids for display logic
   getOptionClass(optionId: string): string {
     if (!this.answerSubmitted) {
-      return this.selectedAnswer === optionId
-        ? 'option-selected'
-        : 'option-default';
+      return this.selectedAnswer === optionId ? 'option-selected' : 'option-default';
     }
-    if (optionId === this.correctShuffledId)  return 'option-correct';
-    if (optionId === this.selectedAnswer)     return 'option-wrong';
+    if (optionId === this.correctShuffledId) return 'option-correct';
+    if (optionId === this.selectedAnswer)    return 'option-wrong';
     return 'option-default option-dimmed';
   }
 
@@ -295,18 +268,18 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
 
   getGrade(): { label: string; color: string } {
     const pct = this.getScorePercentage();
-    if (pct >= 90) return { label: 'Expert',        color: 'text-cyber-green'  };
-    if (pct >= 70) return { label: 'Proficient',    color: 'text-cyber-accent' };
-    if (pct >= 50) return { label: 'Developing',    color: 'text-cyber-yellow' };
-    return          { label: 'Needs Practice',      color: 'text-cyber-red'    };
+    if (pct >= 90) return { label: 'Expert',       color: 'text-cyber-green'  };
+    if (pct >= 70) return { label: 'Proficient',   color: 'text-cyber-accent' };
+    if (pct >= 50) return { label: 'Developing',   color: 'text-cyber-yellow' };
+    return          { label: 'Needs Practice',     color: 'text-cyber-red'    };
   }
 
-  getDifficultyLabel(): string {
-    return DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)?.label ?? 'Rookie';
+  get difficultyLabel(): string {
+    return this.difficultyConfig?.label ?? 'Rookie';
   }
 
-  getDifficultyBadgeClass(): string {
-    return DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)?.badgeClass ?? 'badge-rookie';
+  get difficultyBadgeClass(): string {
+    return this.difficultyConfig?.badgeClass ?? 'badge-rookie';
   }
 
   get currentTip(): string {
@@ -314,21 +287,22 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
   }
 
   goToResults(): void {
-  const multiplier = DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)?.pointMultiplier ?? 1;
-  const baseScore  = multiplier > 1 ? Math.round(this.sessionScore / multiplier) : this.sessionScore;
+    const multiplier = this.difficultyConfig.pointMultiplier;
+    const baseScore  = multiplier > 1 ? Math.round(this.sessionScore / multiplier) : this.sessionScore;
 
-  this.router.navigate(['/results'], {
-    queryParams: {
-      mode:       'social-eng-quiz',
-      score:      this.sessionScore,
-      baseScore,
-      total:      this.totalPossible,
-      correct:    this.correctCount,
-      streak:     this.bestStreak,
-      multiplier
-    }
-  });
-}
+    this.router.navigate(['/results'], {
+      queryParams: {
+        mode:       'social-eng-quiz',
+        score:      this.sessionScore,
+        baseScore,
+        total:      this.totalPossible,
+        correct:    this.correctCount,
+        streak:     this.bestStreak,
+        multiplier
+      }
+    });
+  }
+
   goHome(): void {
     this.router.navigate(['/']);
   }

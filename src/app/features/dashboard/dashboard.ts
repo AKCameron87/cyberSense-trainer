@@ -1,24 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { ProgressService } from '../../core/services/progress.service';
+import { CommonModule }      from '@angular/common';
+import { Router }            from '@angular/router';
+import { ProgressService }   from '../../core/services/progress.service';
 import { UserProgress, Badge, CategoryScore, GameSession } from '../../core/models/index';
 
 @Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule],
+  selector:    'app-dashboard',
+  standalone:  true,
+  imports:     [CommonModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
+  styleUrl:    './dashboard.css'
 })
 export class DashboardComponent implements OnInit {
 
-  progress:       UserProgress | null = null;
-  earnedBadges:   Badge[]             = [];
-  lockedBadges:   Badge[]             = [];
-  recentSessions: GameSession[]       = [];
+  progress!:      UserProgress;
+  earnedBadges:   Badge[]       = [];
+  lockedBadges:   Badge[]       = [];
+  recentSessions: GameSession[] = [];
   weakestArea:    CategoryScore | null = null;
-  accuracy:       number              = 0;
+  accuracy       = 0;
 
   constructor(
     private progressService: ProgressService,
@@ -31,9 +31,7 @@ export class DashboardComponent implements OnInit {
     this.lockedBadges   = this.progress.badges.filter(b => !b.earnedAt);
     this.accuracy       = this.progressService.getAccuracyPercentage();
     this.weakestArea    = this.progressService.getWeakestCategory();
-    this.recentSessions = this.progressService.getAllSessions()
-      .slice(-5)
-      .reverse();
+    this.recentSessions = this.progressService.getAllSessions().slice(-5).reverse();
   }
 
   getAccuracyColor(): string {
@@ -56,12 +54,10 @@ export class DashboardComponent implements OnInit {
     return mode === 'phishing-sim' ? 'Phishing Sim' : 'Social Eng Quiz';
   }
 
-  getSessionResult(session: GameSession): string {
-    return session.passed ? '✅ Passed' : '❌ Failed';
-  }
-
-  getSessionResultColor(session: GameSession): string {
-    return session.passed ? 'text-cyber-green' : 'text-cyber-red';
+  getSessionStatus(session: GameSession): { label: string; color: string } {
+    return session.passed
+      ? { label: '✅ Passed', color: 'text-cyber-green' }
+      : { label: '❌ Failed', color: 'text-cyber-red'   };
   }
 
   formatDate(iso: string | null): string {
@@ -72,7 +68,7 @@ export class DashboardComponent implements OnInit {
   }
 
   hasPlayed(): boolean {
-    return (this.progress?.totalSessions ?? 0) > 0;
+    return this.progress.totalSessions > 0;
   }
 
   resetProgress(): void {
@@ -82,15 +78,7 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  goHome(): void {
-    this.router.navigate(['/']);
-  }
-
-  playPhishing(): void {
-    this.router.navigate(['/phishing-sim']);
-  }
-
-  playQuiz(): void {
-    this.router.navigate(['/social-eng-quiz']);
-  }
+  goHome():      void { this.router.navigate(['/']);               }
+  playPhishing():void { this.router.navigate(['/phishing-sim']);   }
+  playQuiz():    void { this.router.navigate(['/social-eng-quiz']); }
 }

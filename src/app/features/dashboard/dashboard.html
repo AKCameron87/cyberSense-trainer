@@ -103,8 +103,8 @@
               </div>
               <div class="text-right flex-shrink-0">
                 <p class="text-sm font-bold text-cyber-accent">{{ session.totalScore }} pts</p>
-                <p [class]="'text-xs ' + getSessionResultColor(session)">
-                  {{ getSessionResult(session) }}
+                <p [class]="'text-xs ' + getSessionStatus(session).color">
+                  {{ getSessionStatus(session).label }}
                 </p>
               </div>
             </div>

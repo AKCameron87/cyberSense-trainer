@@ -1,9 +1,8 @@
-import { Component, signal, computed } from '@angular/core';
-import { CommonModule }  from '@angular/common';
-import { FormsModule }   from '@angular/forms';
-import { RouterLink }    from '@angular/router';
-import { Router }        from '@angular/router';
-import { AuthService }   from '../../core/services/auth.service';
+import { Component, signal } from '@angular/core';
+import { CommonModule }       from '@angular/common';
+import { FormsModule }        from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService }        from '../../core/services/auth.service';
 
 interface PasswordRequirement {
   label: string;
@@ -19,10 +18,10 @@ interface PasswordRequirement {
 })
 export class AuthComponent {
 
-  mode        = signal<'login' | 'register'>('login');
-  email       = '';
-  password    = '';
-  displayName = '';
+  mode          = signal<'login' | 'register'>('login');
+  email         = '';
+  password      = '';
+  displayName   = '';
   errorMessage  = '';
   loading       = false;
   showPassword  = false;
@@ -36,23 +35,26 @@ export class AuthComponent {
 
   get passwordRequirements(): PasswordRequirement[] {
     return [
-      { label: 'At least 16 characters',  met: this.password.length >= 16 },
-      { label: 'Uppercase letter (A-Z)',   met: /[A-Z]/.test(this.password) },
-      { label: 'Lowercase letter (a-z)',   met: /[a-z]/.test(this.password) },
-      { label: 'Number (0-9)',             met: /[0-9]/.test(this.password) },
-      { label: 'Special character (!@#…)', met: /[^A-Za-z0-9]/.test(this.password) },
+      { label: 'At least 16 characters',   met: this.password.length >= 16      },
+      { label: 'Uppercase letter (A-Z)',    met: /[A-Z]/.test(this.password)     },
+      { label: 'Lowercase letter (a-z)',    met: /[a-z]/.test(this.password)     },
+      { label: 'Number (0-9)',              met: /[0-9]/.test(this.password)     },
+      { label: 'Special character (!@#…)',  met: /[^A-Za-z0-9]/.test(this.password) },
     ];
   }
 
+  private get metCount(): number {
+    return this.passwordRequirements.filter(r => r.met).length;
+  }
+
   get passwordValid(): boolean {
-    return this.passwordRequirements.every(r => r.met);
+    return this.metCount === this.passwordRequirements.length;
   }
 
   get passwordStrength(): 'empty' | 'weak' | 'fair' | 'strong' {
-    if (!this.password) return 'empty';
-    const metCount = this.passwordRequirements.filter(r => r.met).length;
-    if (metCount <= 1) return 'weak';
-    if (metCount <= 3) return 'fair';
+    if (!this.password)        return 'empty';
+    if (this.metCount <= 1)    return 'weak';
+    if (this.metCount <= 3)    return 'fair';
     return 'strong';
   }
 
@@ -66,8 +68,7 @@ export class AuthComponent {
   }
 
   get strengthWidth(): string {
-    const metCount = this.passwordRequirements.filter(r => r.met).length;
-    return `${(metCount / this.passwordRequirements.length) * 100}%`;
+    return `${(this.metCount / this.passwordRequirements.length) * 100}%`;
   }
 
   // ─── Auth Actions ─────────────────────────────────────────────────
@@ -97,7 +98,6 @@ export class AuthComponent {
   }
 
   async register(): Promise<void> {
-    // Validate password policy before hitting Firebase
     if (!this.passwordValid) {
       this.errorMessage = 'Please meet all password requirements before registering.';
       return;
@@ -116,13 +116,13 @@ export class AuthComponent {
 
   getFriendlyError(code: string): string {
     const errors: Record<string, string> = {
-      'auth/email-already-in-use':  'An account with this email already exists.',
-      'auth/invalid-email':         'Please enter a valid email address.',
-      'auth/weak-password':         'Password must meet the complexity requirements.',
-      'auth/user-not-found':        'No account found with this email.',
-      'auth/wrong-password':        'Incorrect password.',
-      'auth/invalid-credential':    'Invalid email or password.',
-      'auth/password-does-not-meet-requirements': 'Password does not meet the security requirements.',
+      'auth/email-already-in-use':                 'An account with this email already exists.',
+      'auth/invalid-email':                        'Please enter a valid email address.',
+      'auth/weak-password':                        'Password must meet the complexity requirements.',
+      'auth/user-not-found':                       'No account found with this email.',
+      'auth/wrong-password':                       'Incorrect password.',
+      'auth/invalid-credential':                   'Invalid email or password.',
+      'auth/password-does-not-meet-requirements':  'Password does not meet the security requirements.',
     };
     return errors[code] ?? 'Something went wrong. Please try again.';
   }

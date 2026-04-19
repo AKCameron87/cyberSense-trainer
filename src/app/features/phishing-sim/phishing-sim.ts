@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule }   from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { ScenarioService }    from '../../core/services/scenario.service';
-import { ProgressService }    from '../../core/services/progress.service';
-import { AiScenarioService }  from '../../core/services/ai-scenario.service';
-import { PhishingScenario, RedFlag, Difficulty, DIFFICULTY_CONFIGS } from '../../core/models/index';
+import { ScenarioService }   from '../../core/services/scenario.service';
+import { ProgressService }   from '../../core/services/progress.service';
+import { AiScenarioService } from '../../core/services/ai-scenario.service';
+import { PhishingScenario, RedFlag, Difficulty, DIFFICULTY_CONFIGS, DifficultyConfig } from '../../core/models/index';
 
 @Component({
   selector:    'app-phishing-sim',
@@ -27,23 +27,32 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
   foundFlagIds:    string[] = [];
   shownFeedback:   RedFlag | null = null;
 
-  // Wrong click feedback
-  wrongClickMessage:  string = '';
-  showWrongFeedback:  boolean = false;
-  wrongClickPenalty:  number = 25;
-  totalPenalties:     number = 0;
+  wrongClickMessage  = '';
+  showWrongFeedback  = false;
+  wrongClickPenalty  = 25;
+  totalPenalties     = 0;
 
-  sessionScore     = 0;
-  totalPossible    = 0;
+  sessionScore       = 0;
+  totalPossible      = 0;
 
-  loading          = true;
-  error            = false;
-  safeBodyHtml:    SafeHtml = '';
-  loadingMessage   = 'Loading scenarios...';
+  loading            = true;
+  safeBodyHtml:      SafeHtml = '';
+  loadingMessage     = 'Loading scenarios...';
 
-  private bodyClickHandler:  ((e: MouseEvent) => void) | null = null;
-  private flagClickHandlers: Map<string, (e: MouseEvent) => void> = new Map();
-  private renderTimeout:     ReturnType<typeof setTimeout> | null = null;
+  // Cached difficulty config — set once in ngOnInit
+  private difficultyConfig!: DifficultyConfig;
+
+  private readonly WRONG_CLICK_MESSAGES = [
+    `❌ That's not suspicious!`,
+    `⚠️ Nothing wrong there!`,
+    `🔍 Look more carefully!`,
+    `❌ Not a red flag!`,
+    `⚠️ That looks legitimate!`,
+  ];
+
+  private bodyClickHandler:   ((e: MouseEvent) => void) | null = null;
+  private flagClickHandlers:  Map<string, (e: MouseEvent) => void> = new Map();
+  private renderTimeout:      ReturnType<typeof setTimeout> | null = null;
   private wrongFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
@@ -57,10 +66,17 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.scenarioService.loadCustomScenarios(); //Loads custom scenarios into memory so they can be used as fallback if AI generation fails or is disabled
+    await this.scenarioService.loadCustomScenarios();
+
     const diff   = this.route.snapshot.queryParamMap.get('difficulty') as Difficulty;
     const aiMode = this.route.snapshot.queryParamMap.get('aiMode') === 'true';
-    this.difficulty = diff ?? Difficulty.Rookie;
+    this.difficulty       = diff ?? Difficulty.Rookie;
+    this.difficultyConfig = DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)
+      ?? DIFFICULTY_CONFIGS[0];
+
+    this.wrongClickPenalty = this.difficultyConfig.level === Difficulty.Rookie  ? 15
+                           : this.difficultyConfig.level === Difficulty.Analyst ? 25
+                           : 40;
 
     if (aiMode) {
       this.loadingMessage = '🤖 AI is generating your scenarios...';
@@ -71,11 +87,6 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
       this.scenarios = this.getFallbackScenarios();
     }
 
-    // Set penalty based on difficulty
-    this.wrongClickPenalty = this.difficulty === Difficulty.Rookie  ? 15
-                           : this.difficulty === 'analyst' as Difficulty ? 25
-                           : 40;
-
     this.totalPossible = this.scenarios.reduce((sum, s) => sum + s.totalPoints, 0);
     this.loading       = false;
     this.cdr.detectChanges();
@@ -83,7 +94,7 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.removeAllListeners();
-    if (this.renderTimeout)     clearTimeout(this.renderTimeout);
+    if (this.renderTimeout)      clearTimeout(this.renderTimeout);
     if (this.wrongFeedbackTimer) clearTimeout(this.wrongFeedbackTimer);
   }
 
@@ -101,12 +112,12 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
   loadScenario(index: number): void {
     this.removeAllListeners();
 
-    this.currentIndex    = index;
-    this.currentScenario = this.scenarios[index];
-    this.foundFlagIds    = [];
-    this.shownFeedback   = null;
+    this.currentIndex      = index;
+    this.currentScenario   = this.scenarios[index];
+    this.foundFlagIds      = [];
+    this.shownFeedback     = null;
     this.showWrongFeedback = false;
-    this.safeBodyHtml    = this.sanitizer.bypassSecurityTrustHtml(
+    this.safeBodyHtml      = this.sanitizer.bypassSecurityTrustHtml(
       this.currentScenario.bodyHtml
     );
 
@@ -141,8 +152,7 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
     const body = document.getElementById('scenario-body');
     if (body) {
       this.bodyClickHandler = (e: MouseEvent) => {
-        const target = e.target as HTMLElement;
-
+        const target    = e.target as HTMLElement;
         const isRedFlag = this.currentScenario?.redFlags.some(f => {
           const el = document.getElementById(f.elementId);
           return el && (el === target || el.contains(target));
@@ -160,8 +170,7 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
 
   private removeAllListeners(): void {
     this.flagClickHandlers.forEach((handler, elementId) => {
-      const el = document.getElementById(elementId);
-      if (el) el.removeEventListener('click', handler);
+      document.getElementById(elementId)?.removeEventListener('click', handler);
     });
     this.flagClickHandlers.clear();
 
@@ -177,8 +186,7 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
     e.stopPropagation();
     if (!this.currentScenario) return;
 
-    const target = e.target as HTMLElement;
-
+    const target      = e.target as HTMLElement;
     const matchedFlag = this.currentScenario.redFlags.find(flag => {
       const el = document.getElementById(flag.elementId);
       return el && (el === target || el.contains(target));
@@ -187,7 +195,6 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
     if (matchedFlag) {
       this.onRedFlagClick(matchedFlag);
     } else {
-      // Clicked in header but not on a red flag
       this.onWrongClick(target);
     }
   }
@@ -196,16 +203,11 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
     if (!this.currentScenario) return;
     if (this.foundFlagIds.includes(flag.id)) return;
 
-    // Hide any wrong feedback if showing
     this.showWrongFeedback = false;
+    this.foundFlagIds      = [...this.foundFlagIds, flag.id];
+    this.shownFeedback     = flag;
 
-    this.foundFlagIds  = [...this.foundFlagIds, flag.id];
-    this.shownFeedback = flag;
-
-    const multiplier = DIFFICULTY_CONFIGS.find(
-      d => d.level === this.difficulty
-    )?.pointMultiplier ?? 1;
-    const points = Math.round(flag.points * multiplier);
+    const points = Math.round(flag.points * this.difficultyConfig.pointMultiplier);
     this.sessionScore += points;
 
     const el = document.getElementById(flag.elementId);
@@ -226,30 +228,20 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
   }
 
   onWrongClick(target: HTMLElement): void {
-    // Don't penalise clicks on already-found flags or empty space
     const tagName = target.tagName.toLowerCase();
     if (['div', 'section', 'main', 'body', 'table', 'tbody', 'tr'].includes(tagName)) return;
 
-    // Deduct points (don't go below 0)
-    const penalty = this.wrongClickPenalty;
+    const penalty       = this.wrongClickPenalty;
     this.sessionScore   = Math.max(0, this.sessionScore - penalty);
     this.totalPenalties += penalty;
 
-    // Pick a random wrong-click message
-    const messages = [
-      `❌ That's not suspicious! -${penalty} pts`,
-      `⚠️ Nothing wrong there! -${penalty} pts`,
-      `🔍 Look more carefully! -${penalty} pts`,
-      `❌ Not a red flag! -${penalty} pts`,
-      `⚠️ That looks legitimate! -${penalty} pts`,
+    const base = this.WRONG_CLICK_MESSAGES[
+      Math.floor(Math.random() * this.WRONG_CLICK_MESSAGES.length)
     ];
-    this.wrongClickMessage = messages[Math.floor(Math.random() * messages.length)];
-
-    // Dismiss correct feedback if showing
+    this.wrongClickMessage = `${base} -${penalty} pts`;
     this.shownFeedback     = null;
     this.showWrongFeedback = true;
 
-    // Auto-dismiss after 2 seconds
     if (this.wrongFeedbackTimer) clearTimeout(this.wrongFeedbackTimer);
     this.wrongFeedbackTimer = setTimeout(() => {
       this.showWrongFeedback = false;
@@ -270,6 +262,18 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
       : false;
   }
 
+  get selectedDifficulty(): DifficultyConfig {
+    return this.difficultyConfig ?? DIFFICULTY_CONFIGS[0];
+  }
+
+  get difficultyLabel(): string {
+    return this.difficultyConfig?.label ?? 'Rookie';
+  }
+
+  get difficultyBadgeClass(): string {
+    return this.difficultyConfig?.badgeClass ?? 'badge-rookie';
+  }
+
   nextScenario(): void {
     if (this.currentIndex < this.scenarios.length - 1) {
       this.loadScenario(this.currentIndex + 1);
@@ -285,36 +289,22 @@ export class PhishingSimComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
- goToResults(): void {
-  const multiplier = DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)?.pointMultiplier ?? 1;
-  const baseScore  = multiplier > 1 ? Math.round(this.sessionScore / multiplier) : this.sessionScore;
+  goToResults(): void {
+    const multiplier = this.difficultyConfig.pointMultiplier;
+    const baseScore  = multiplier > 1 ? Math.round(this.sessionScore / multiplier) : this.sessionScore;
 
-  this.router.navigate(['/results'], {
-    queryParams: {
-      mode:      'phishing-sim',
-      score:     this.sessionScore,
-      baseScore,
-      total:     this.totalPossible,
-      multiplier
-    }
-  });
-}
+    this.router.navigate(['/results'], {
+      queryParams: {
+        mode:      'phishing-sim',
+        score:     this.sessionScore,
+        baseScore,
+        total:     this.totalPossible,
+        multiplier
+      }
+    });
+  }
 
   goHome(): void {
     this.router.navigate(['/']);
   }
-
-  getDifficultyLabel(): string {
-    return DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)?.label ?? 'Rookie';
-  }
-
-  getDifficultyBadgeClass(): string {
-    return DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty)?.badgeClass ?? 'badge-rookie';
-  }
-
-  get selectedDifficulty() {
-  return DIFFICULTY_CONFIGS.find(d => d.level === this.difficulty) ?? DIFFICULTY_CONFIGS[0];
- }
-
 }
-

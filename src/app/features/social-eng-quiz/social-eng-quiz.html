@@ -11,7 +11,7 @@
       </div>
       <span class="text-cyber-muted text-sm">Score:</span>
       <span class="text-cyber-accent font-bold text-lg">{{ sessionScore }}</span>
-      <span [class]="getDifficultyBadgeClass()">{{ getDifficultyLabel() }}</span>
+      <span [class]="difficultyBadgeClass">{{ difficultyLabel }}</span>
     </div>
   </header>
 
@@ -23,17 +23,8 @@
     </div>
   </div>
 
-  <!-- Error -->
-  <div *ngIf="error && !loading" class="flex items-center justify-center min-h-[60vh]">
-    <div class="card text-center max-w-md">
-      <p class="text-4xl mb-4">⚠️</p>
-      <p class="text-white font-bold mb-2">Failed to load questions</p>
-      <button (click)="goHome()" class="btn-secondary mt-4">Go Home</button>
-    </div>
-  </div>
-
   <!-- Pre-session lobby -->
-  <div *ngIf="!loading && !error && !sessionStarted" class="max-w-3xl mx-auto px-6 py-16 text-center">
+  <div *ngIf="!loading && !sessionStarted" class="max-w-3xl mx-auto px-6 py-16 text-center">
     <span class="text-6xl mb-6 block">🧠</span>
     <h2 class="text-4xl font-bold mb-4">Social Engineering Quiz</h2>
     <p class="text-cyber-muted text-lg mb-8 max-w-xl mx-auto">
@@ -51,7 +42,7 @@
         <p class="text-cyber-muted text-xs mt-1">Max Points</p>
       </div>
       <div class="card py-4 text-center">
-        <p class="text-cyber-yellow font-bold text-xl">{{ getDifficultyLabel() }}</p>
+        <p class="text-cyber-yellow font-bold text-xl">{{ difficultyLabel }}</p>
         <p class="text-cyber-muted text-xs mt-1">Difficulty</p>
       </div>
     </div>
@@ -114,18 +105,18 @@
 
     <!-- Answer options -->
     <div class="space-y-3 mb-6">
-    <button
-      *ngFor="let option of shuffledOptions"
-      [class]="'option-btn ' + getOptionClass(option.id)"
-      (click)="selectAnswer(option.id)"
-      [disabled]="answerSubmitted">
-      <span class="option-letter">{{ option.id.toUpperCase() }}</span>
-      <span class="flex-1 text-left">{{ option.text }}</span>
-      <span *ngIf="answerSubmitted && option.id === correctShuffledId"
-        class="text-cyber-green text-lg">✓</span>
+      <button
+        *ngFor="let option of shuffledOptions"
+        [class]="'option-btn ' + getOptionClass(option.id)"
+        (click)="selectAnswer(option.id)"
+        [disabled]="answerSubmitted">
+        <span class="option-letter">{{ option.id.toUpperCase() }}</span>
+        <span class="flex-1 text-left">{{ option.text }}</span>
+        <span *ngIf="answerSubmitted && option.id === correctShuffledId"
+              class="text-cyber-green text-lg">✓</span>
         <span *ngIf="answerSubmitted && option.id === selectedAnswer && !isCorrect"
-        class="text-cyber-red text-lg">✗</span>
-    </button>
+              class="text-cyber-red text-lg">✗</span>
+      </button>
     </div>
 
     <!-- Submit / Next -->

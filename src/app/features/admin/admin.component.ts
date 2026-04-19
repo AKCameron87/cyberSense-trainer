@@ -1,8 +1,8 @@
 import { Component, OnInit, signal, ChangeDetectorRef } from '@angular/core';
-import { CommonModule }              from '@angular/common';
-import { FormsModule }               from '@angular/forms';
-import { Router }                    from '@angular/router';
-import { AdminService }              from '../../core/services/admin.service';
+import { CommonModule }  from '@angular/common';
+import { FormsModule }   from '@angular/forms';
+import { Router }        from '@angular/router';
+import { AdminService }  from '../../core/services/admin.service';
 import {
   PhishingScenario, QuizQuestion,
   Difficulty, AttackType, ScenarioType
@@ -16,7 +16,7 @@ type Mode = 'list' | 'edit';
   standalone:  true,
   imports:     [CommonModule, FormsModule],
   templateUrl: './admin.html',
-  styleUrls:   ['./admin.css']
+  styleUrl:    './admin.css'
 })
 export class AdminComponent implements OnInit {
 
@@ -27,21 +27,19 @@ export class AdminComponent implements OnInit {
   error      = '';
   success    = '';
 
-  // ─── Phishing ────────────────────────────────────────────────────
   scenarios:       PhishingScenario[] = [];
   editingScenario: PhishingScenario   = this.blankScenario();
 
-  // ─── Quiz ────────────────────────────────────────────────────────
   questions:       QuizQuestion[]     = [];
   editingQuestion: QuizQuestion       = this.blankQuestion();
 
-  readonly difficulties = [Difficulty.Rookie, 'analyst' as Difficulty, Difficulty.Expert];
+  readonly difficulties = [Difficulty.Rookie, Difficulty.Analyst, Difficulty.Expert];
   readonly attackTypes  = Object.values(AttackType);
 
   constructor(
     private adminService: AdminService,
     private router:       Router,
-    private cdr: ChangeDetectorRef
+    private cdr:          ChangeDetectorRef
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -51,22 +49,15 @@ export class AdminComponent implements OnInit {
   async loadAll(): Promise<void> {
     this.loading = true;
     try {
-    console.log('Loading custom scenarios...');
-    this.scenarios = await this.adminService.getCustomScenarios();
-    console.log('Scenarios loaded:', this.scenarios.length);
-    
-    console.log('Loading custom questions...');
-    this.questions = await this.adminService.getCustomQuestions();
-    console.log('Questions loaded:', this.questions.length);
-  } catch (err) {
-    console.error('loadAll failed:', err);
-    this.error = 'Failed to load data from Firestore.';
-  } finally {
-    this.loading = false;
-    this.cdr.detectChanges();
-    console.log('Loading complete, loading =', this.loading);
+      this.scenarios = await this.adminService.getCustomScenarios();
+      this.questions = await this.adminService.getCustomQuestions();
+    } catch {
+      this.error = 'Failed to load data from Firestore.';
+    } finally {
+      this.loading = false;
+      this.cdr.detectChanges();
+    }
   }
-}
 
   // ─── Tab & Mode ───────────────────────────────────────────────────
 
@@ -117,7 +108,7 @@ export class AdminComponent implements OnInit {
       this.success = 'Scenario saved successfully!';
       await this.loadAll();
       this.mode.set('list');
-    } catch (err) {
+    } catch {
       this.error = 'Failed to save scenario.';
     } finally {
       this.saving = false;
@@ -132,7 +123,7 @@ export class AdminComponent implements OnInit {
       this.success = 'Question saved successfully!';
       await this.loadAll();
       this.mode.set('list');
-    } catch (err) {
+    } catch {
       this.error = 'Failed to save question.';
     } finally {
       this.saving = false;
@@ -212,7 +203,7 @@ export class AdminComponent implements OnInit {
   private blankScenario(): PhishingScenario {
     return {
       id:          '',
-      type:        ScenarioType.Email,       // ← use enum
+      type:        ScenarioType.Email,
       difficulty:  Difficulty.Rookie,
       title:       '',
       description: 'Identify the red flags in this email.',
@@ -227,7 +218,7 @@ export class AdminComponent implements OnInit {
         { id: 'rf3', elementId: 'rf-link',    description: '', points: 100 },
         { id: 'rf4', elementId: 'rf-footer',  description: '', points: 100 }
       ],
-      bodyHtml:    ''
+      bodyHtml: ''
     };
   }
 

@@ -1,8 +1,8 @@
-import { Component, OnInit }    from '@angular/core';
-import { CommonModule }         from '@angular/common';
-import { Router }               from '@angular/router';
-import { FirestoreService }     from '../../core/services/firestore.service';
-import { AuthService }          from '../../core/services/auth.service';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule }    from '@angular/common';
+import { Router }          from '@angular/router';
+import { FirestoreService, LeaderboardEntry } from '../../core/services/firestore.service';
+import { AuthService }     from '../../core/services/auth.service';
 
 @Component({
   selector:    'app-leaderboard',
@@ -13,23 +13,29 @@ import { AuthService }          from '../../core/services/auth.service';
 })
 export class LeaderboardComponent implements OnInit {
 
-  entries:  any[]  = [];
+  entries:         LeaderboardEntry[] = [];
   loading          = true;
   currentUserRank  = 0;
+  currentUserUid   = '';
 
   constructor(
     private firestoreService: FirestoreService,
-    public  authService:      AuthService,
-    private router:           Router
+    private authService:      AuthService,
+    private router:           Router,
+    private cdr:              ChangeDetectorRef
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.entries = await this.firestoreService.getLeaderboard(20);
-    const uid    = this.authService.currentUser()?.uid;
-    if (uid) {
-      this.currentUserRank = this.entries.findIndex(e => e.id === uid) + 1;
+    this.currentUserUid = this.authService.currentUser()?.uid ?? '';
+    this.entries        = await this.firestoreService.getLeaderboard(20);
+
+    if (this.currentUserUid) {
+      const idx            = this.entries.findIndex(e => e.id === this.currentUserUid);
+      this.currentUserRank = idx >= 0 ? idx + 1 : 0;
     }
+
     this.loading = false;
+    this.cdr.detectChanges();
   }
 
   getRankIcon(rank: number): string {
@@ -46,8 +52,8 @@ export class LeaderboardComponent implements OnInit {
     return 'border-cyber-border';
   }
 
-  isCurrentUser(entry: any): boolean {
-    return entry.id === this.authService.currentUser()?.uid;
+  isCurrentUser(entry: LeaderboardEntry): boolean {
+    return entry.id === this.currentUserUid;
   }
 
   goHome(): void {
