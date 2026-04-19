@@ -70,7 +70,7 @@ export class SocialEngQuizComponent implements OnInit, OnDestroy {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    await this.scenarioService.loadCustomScenarios();
+    await this.scenarioService.loadAll();
 
     const diff   = this.route.snapshot.queryParamMap.get('difficulty') as Difficulty;
     const aiMode = this.route.snapshot.queryParamMap.get('aiMode') === 'true';

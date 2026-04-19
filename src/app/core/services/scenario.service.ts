@@ -2,24 +2,40 @@ import { Injectable } from '@angular/core';
 import { PhishingScenario, QuizQuestion, Difficulty, AttackType } from '../models/index';
 import { AdminService } from './admin.service';
 
-import phishingData from '../../../assets/data/phishing-scenarios.json';
-import quizData     from '../../../assets/data/quiz-scenarios.json';
-
 @Injectable({ providedIn: 'root' })
 export class ScenarioService {
 
-  private staticPhishing: PhishingScenario[] = phishingData as PhishingScenario[];
-  private staticQuiz:     QuizQuestion[]     = quizData     as QuizQuestion[];
+  private staticPhishing: PhishingScenario[] = [];
+  private staticQuiz:     QuizQuestion[]     = [];
 
   private customPhishing: PhishingScenario[] = [];
   private customQuiz:     QuizQuestion[]     = [];
-  private customLoaded    = false;
 
-  // Cached merged arrays — rebuilt once after custom load
-  private _allPhishing: PhishingScenario[] = [...this.staticPhishing];
-  private _allQuiz:     QuizQuestion[]     = [...this.staticQuiz];
+  private staticLoaded = false;
+  private customLoaded = false;
+
+  private _allPhishing: PhishingScenario[] = [];
+  private _allQuiz:     QuizQuestion[]     = [];
 
   constructor(private adminService: AdminService) {}
+
+  // ─── Load static scenarios (lazy — only when first needed) ───────
+
+  async loadStaticScenarios(): Promise<void> {
+    if (this.staticLoaded) return;
+    try {
+      const [phishingRes, quizRes] = await Promise.all([
+        fetch('assets/data/phishing-scenarios.json'),
+        fetch('assets/data/quiz-scenarios.json')
+      ]);
+      this.staticPhishing = await phishingRes.json() as PhishingScenario[];
+      this.staticQuiz     = await quizRes.json()     as QuizQuestion[];
+      this.staticLoaded   = true;
+      this.rebuildArrays();
+    } catch (err) {
+      console.error('Failed to load static scenarios:', err);
+    }
+  }
 
   // ─── Load custom scenarios from Firestore ────────────────────────
 
@@ -29,13 +45,24 @@ export class ScenarioService {
       this.customPhishing = await this.adminService.getCustomScenarios();
       this.customQuiz     = await this.adminService.getCustomQuestions();
       this.customLoaded   = true;
-
-      // Rebuild merged arrays once after load
-      this._allPhishing = [...this.staticPhishing, ...this.customPhishing];
-      this._allQuiz     = [...this.staticQuiz,     ...this.customQuiz];
+      this.rebuildArrays();
     } catch (err) {
       console.warn('Could not load custom scenarios from Firestore:', err);
     }
+  }
+
+  // ─── Load everything — called by game modes ───────────────────────
+
+  async loadAll(): Promise<void> {
+    await Promise.all([
+      this.loadStaticScenarios(),
+      this.loadCustomScenarios()
+    ]);
+  }
+
+  private rebuildArrays(): void {
+    this._allPhishing = [...this.staticPhishing, ...this.customPhishing];
+    this._allQuiz     = [...this.staticQuiz,     ...this.customQuiz];
   }
 
   // ─── Phishing ─────────────────────────────────────────────────────

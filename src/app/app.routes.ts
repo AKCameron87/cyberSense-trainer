@@ -40,7 +40,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     loadComponent: () =>
-      import('../app/features/admin/admin.component').then(m => m.AdminComponent),
+      import('./features/admin/admin.component').then(m => m.AdminComponent),
     canActivate: [adminGuard]
   },
   {
